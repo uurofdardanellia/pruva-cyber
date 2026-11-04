@@ -306,6 +306,19 @@ details.it>*+*{margin-top:10px}
   .timeline li{grid-template-columns:1fr;gap:0}
   .sos{flex-wrap:wrap}.sos-go{margin-left:0}
 }
+
+.rlist{list-style:none;margin:0;padding:0}
+.ritem{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:12px 14px;align-items:start;padding:14px 0;border-bottom:1px solid var(--line)}
+.ritem:last-child{border-bottom:0;padding-bottom:0}
+.rdot{width:12px;height:12px;border-radius:50%;margin-top:6px;background:var(--ok)}
+.r-due .rdot{background:var(--warn)} .r-over .rdot{background:var(--bad);box-shadow:0 0 0 4px var(--bad-bg)}
+.rtitle{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:600 1rem/1.35 var(--f-body);color:var(--ink)}
+.r-ok .rtitle{color:color-mix(in srgb,var(--ink) 70%,var(--muted));font-weight:500}
+.rmeta{display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center;margin-top:5px}
+.rdetail{display:flex;flex-direction:column;gap:10px;margin-top:10px;max-width:72ch}
+.rdetail p{margin:0}
+.rbtn{align-self:center;white-space:nowrap}
+@media (max-width:860px){.ritem{grid-template-columns:14px minmax(0,1fr)}.rbtn{grid-column:2;justify-self:start}}
 </style>
 </head>
 <body>
@@ -318,6 +331,7 @@ details.it>*+*{margin-top:10px}
     <div class="nav-label">Menu</div>
     <nav id="nav">
       <a href="#panel"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Home</a>
+      <a href="#rutin"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15l2 2 4-4"/></svg>Routine checks<span class="badge" id="rtBadge" hidden></span></a>
       <a href="#playbook" class="nav-sos"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M12 8v5"/><path d="M12 16v.3"/></svg>Emergency guide</a>
       <a href="#olay"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Incident reports<span class="badge" id="incBadge" hidden></span></a>
       <a href="#kontrol"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>Ship checklist</a>
@@ -712,12 +726,122 @@ const CONTROLS = [
 ];
 const STATUS = {"":["Not answered",""],ok:["Yes","ok"],part:["Partly","warn"],no:["No","bad"],na:["Not relevant",""]};
 
+/* ================== ROUTINE CHECKS (daily / weekly / monthly / yearly) ================== */
+const FREQ={daily:{label:"Daily",win:0},weekly:{label:"Weekly",win:2},monthly:{label:"Monthly",win:5},yearly:{label:"Yearly",win:30}};
+const ROUTINE=[
+  {id:"d_gps",f:"daily",t:"Compare the GPS position with radar or a visual fix",h:"Once every watch, check that the GPS position on the ECDIS matches the radar picture or a visual bearing. Write any difference in the log book.",who:"Officer of the watch",ref:"MSC-FAL 3.5.4 Detect; NIST DE.CM-01"},
+  {id:"d_usb",f:"daily",t:"Check for unknown USB sticks or devices",h:"Look at the bridge, engine control room and cargo control computers. Nothing should be plugged in that you do not know. Remove and report anything unknown.",who:"Officer of the watch / ETO",ref:"EMSA Annex A (removable media); MSC-FAL 3.5.3.5"},
+  {id:"d_alarm",f:"daily",t:"Look for strange alarms or messages on ship systems",h:"Check the ECDIS, engine alarm system and loading computer for unexplained alarms, pop-up messages or settings that changed by themselves.",who:"Officer of the watch / Engineer of the watch",ref:"UR E26 Detect"},
+  {id:"d_backup",f:"daily",t:"Check last night's backup finished",h:"On the office computer, check that the backup program shows 'completed' for last night. If not, tell the SSO.",who:"SSO / Master's office",ref:"NIST PR.DS-11; MSC-FAL 3.5.3.7"},
+  {id:"w_av",f:"weekly",t:"Check antivirus and updates on office computers",h:"Open the antivirus program on each office computer. It should say 'up to date'. Note any computer that is not.",who:"SSO",ref:"EMSA Annex A (update management)"},
+  {id:"w_cab",f:"weekly",t:"Look inside the network cabinets",h:"Open the switch and router cabinets. Look for unknown boxes, extra cables, a cable plugged into the same switch twice, or lights blinking non-stop.",who:"ETO",ref:"EMSA Annex A (network management); UR E26 Protect"},
+  {id:"w_remote",f:"weekly",t:"Make sure remote access is switched off",h:"Check that the remote service connection (VPN box or remote support program) is off when no service is planned.",who:"ETO / Chief Engineer",ref:"MSC-FAL 3.5.3.4; EMSA Annex A (remote connection)"},
+  {id:"w_mail",f:"weekly",t:"Remind the crew about suspicious e-mails",h:"At a meeting or on the notice board: do not open unexpected attachments or links; report strange e-mails to the SSO.",who:"SSO",ref:"MSC-FAL 3.5.3.6"},
+  {id:"m_accounts",f:"monthly",t:"Remove accounts of crew who have left",h:"Ask the company IT or SSO to switch off the computer accounts of everyone who signed off this month. Change any shared password they knew.",who:"SSO + company IT",ref:"EMSA Annex A (account management); MSC-FAL 3.5.3.1"},
+  {id:"m_restore",f:"monthly",t:"Test getting one file back from the backup",h:"Pick one file and restore it from the backup. If it opens, the backup works. Write the result down.",who:"SSO",ref:"EMSA Table 1; NIST RC.RP-03"},
+  {id:"m_inventory",f:"monthly",t:"Update the equipment list",h:"Add new or replaced computers and equipment in 'Ships & equipment'. Remove what is gone.",who:"ETO / SSO",ref:"UR E26 Identify; EMSA Annex A"},
+  {id:"m_logs",f:"monthly",t:"Check that network logs are being saved",h:"Ask the ETO or company IT to confirm the firewall still saves its logs.",who:"ETO / company IT",ref:"UR E26 Detect; MSC-FAL 3.5.3.3"},
+  {id:"m_talk",f:"monthly",t:"Cyber safety talk at the safety meeting",h:"Spend five minutes on one topic: USB sticks, passwords, strange e-mails or what to do if GPS is wrong.",who:"Master / SSO",ref:"MSC-FAL 3.5.3.6; EMSA 3.2.6"},
+  {id:"y_training",f:"yearly",t:"Basic cyber security training for all crew",h:"Every crew member completes the yearly basic training. Engine and bridge users also do the training for their systems. Keep the certificates on board.",who:"Company + Master",ref:"MSC-FAL 3.5.3.6"},
+  {id:"y_drill",f:"yearly",t:"Cyber drill on board",h:"Practise one emergency from the guide, for example ransomware on the office computer or GPS jamming. Write the drill in the log.",who:"Master / SSO",ref:"EMSA 3.2.6; UR E26"},
+  {id:"y_manual",f:"yearly",t:"Test manual control of engine and power",h:"Practise running the main engine, steering and generators by hand or from the local panel, as if the computers had failed.",who:"Chief Engineer",ref:"UR E26 Respond"},
+  {id:"y_recover",f:"yearly",t:"Test full recovery of an important system",h:"Together with the maker or company IT, test that one important system (for example the loading computer) can be reinstalled from its backup.",who:"Chief Engineer + company IT",ref:"UR E26 Recover; MSC-FAL 3.5.6"},
+  {id:"y_ssa",f:"yearly",t:"Company reviews the cyber risks and plans",h:"The company checks the Ship Security Assessment, the incident plan and this checklist, and updates them after any incidents.",who:"Company (CSO / DPA)",ref:"EMSA 3.1.1; MSC-FAL 3.5.3.9; NIS2 Art. 21(2)(f)"}
+];
+const dayStr=d=>{const x=new Date(d);return new Date(x-x.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const todayStr=()=>dayStr(new Date());
+function addPeriod(ds,f){const d=new Date(ds+"T12:00:00");if(f==="daily")d.setDate(d.getDate()+1);else if(f==="weekly")d.setDate(d.getDate()+7);else if(f==="monthly")d.setMonth(d.getMonth()+1);else d.setFullYear(d.getFullYear()+1);return dayStr(d)}
+const daysBetween=(a,b)=>Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5);
+function taskStatus(shipId,task){
+  const rec=((state.routine[shipId]||{}).last||{})[task.id];const today=todayStr();
+  if(!rec)return {st:"due",label:"Never done",due:today,last:null,left:0};
+  const last=dayStr(rec.at);const due=addPeriod(last,task.f);const left=daysBetween(today,due);
+  if(left<0)return {st:"over",label:`Overdue by ${-left} day${left===-1?"":"s"}`,due,last:rec,left};
+  if(left<=FREQ[task.f].win)return {st:"due",label:left===0?"Due today":`Due in ${left} day${left===1?"":"s"}`,due,last:rec,left};
+  return {st:"ok",label:task.f==="daily"?"Done today":`Next in ${left} days`,due,last:rec,left};
+}
+function routineSummary(shipId){const r={over:0,due:0,ok:0};ROUTINE.forEach(t=>r[taskStatus(shipId,t).st]++);return r}
+function vRoutine(){
+  if(!state.ships.length)return `<div class="head"><div><h1>Routine checks</h1></div></div>`+noShips();
+  const s=state.ships.find(x=>x.id===ui.rtShip)||state.ships[0];ui.rtShip=s.id;
+  const sum=routineSummary(s.id);const ff=ui.rtFreq||"all";
+  const order={over:0,due:1,ok:2};
+  const groups=Object.keys(FREQ).filter(f=>ff==="all"||ff==="todo"||f===ff);
+  const html=groups.map(f=>{let ts=ROUTINE.filter(t=>t.f===f).map(t=>({t,s:taskStatus(s.id,t)}));
+    if(ff==="todo")ts=ts.filter(x=>x.s.st!=="ok");if(!ts.length)return"";ts.sort((a,b)=>order[a.s.st]-order[b.s.st]);
+    return `<section class="block"><h2>${FREQ[f].label}</h2><ol class="rlist">${ts.map(({t,s:st})=>{const op=ui.rtOpen[t.id];const hist=((state.routine[s.id]||{}).hist||{})[t.id]||[];
+      return `<li class="ritem r-${st.st}"><span class="rdot" aria-hidden="true"></span>
+        <div class="rmain"><button type="button" class="rtitle" data-rtopen="${t.id}" aria-expanded="${!!op}">${esc(t.t)}</button>
+          <div class="rmeta"><span class="pill ${st.st==="over"?"bad":st.st==="due"?"warn":"ok"}">${st.label}</span><span class="muted small">${esc(t.who)}</span>${st.last?`<span class="muted small">Last: ${st.last.at.slice(0,10)} · ${byLabel(st.last.by)}</span>`:""}<span class="muted small">Due: ${st.due}</span></div>
+          ${op?`<div class="rdetail"><p>${esc(t.h)}</p><label class="f">Note (optional)<input id="rn_${t.id}" placeholder="e.g. all OK / found unknown USB on ECR PC"></label><div class="gref">Rule: ${esc(t.ref)}</div>
+            ${hist.length?`<div><div class="eyebrow">History</div><ol class="done-list">${hist.slice(-8).reverse().map(h=>`<li><span class="mono muted">${h.at.slice(0,16).replace("T"," ")}</span> ${byLabel(h.by)}${h.note?" — "+esc(h.note):""}</li>`).join("")}</ol></div>`:""}</div>`:""}
+        </div>
+        <button class="btn ${st.st==="ok"?"ghost":"primary"} rbtn" data-rtdone="${t.id}" ${st.st==="ok"&&t.f==="daily"?"disabled":""}>${st.st==="ok"?"Done again":"Mark done"}</button></li>`}).join("")}</ol></section>`}).join("");
+  return `<div class="head"><div><h1>Routine checks</h1><p>Small checks that keep the ship's computers safe. Do each one when it is due and press <b>Mark done</b>. Red means overdue, yellow means due now.</p></div></div>
+    <section class="block"><div class="row" style="justify-content:space-between;align-items:flex-end;gap:14px">
+      <label class="f" style="min-width:220px">Ship<select id="rt_ship">${state.ships.map(x=>`<option value="${x.id}" ${x.id===s.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select></label>
+      <div class="row"><span class="pill bad">${sum.over} overdue</span><span class="pill warn">${sum.due} due now</span><span class="pill ok">${sum.ok} up to date</span><button class="btn small ghost" id="rtCopy">Copy list</button></div></div>
+      <div class="chips">${[["todo","To do now"],["all","All"],...Object.entries(FREQ).map(([k,v])=>[k,v.label])].map(([k,v])=>`<button type="button" class="chip" aria-pressed="${ff===k}" data-rtf="${k}">${v}</button>`).join("")}</div></section>
+    ${html||`<div class="empty" style="background:var(--ok-bg);border-color:transparent;color:var(--ink)"><b>Nothing to do right now.</b> All routine checks are up to date.</div>`}`;
+}
+function routineText(shipId){
+  const s=state.ships.find(x=>x.id===shipId);const sum=routineSummary(shipId);
+  let t=`ROUTINE CYBER CHECKS — ${s.name} (IMO ${s.imo||"-"})\nDate: ${todayStr()}\nOverdue ${sum.over} · Due now ${sum.due} · Up to date ${sum.ok}\n`;
+  Object.keys(FREQ).forEach(f=>{t+=`\n== ${FREQ[f].label.toUpperCase()} ==\n`;ROUTINE.filter(x=>x.f===f).forEach(x=>{const st=taskStatus(shipId,x);t+=`[${st.label}] ${x.t}\n   Who: ${x.who} · Last: ${st.last?st.last.at.slice(0,10):"never"} · Due: ${st.due} · Rule: ${x.ref}\n`})});
+  return t;
+}
+async function markRoutine(shipId,taskId){
+  const cur=state.routine[shipId]||{ship:shipId,last:{},hist:{}};const now=new Date().toISOString();
+  const noteEl=document.getElementById("rn_"+taskId);const note=noteEl?noteEl.value.trim():"";
+  const entry={at:now,by:role,note};
+  const last={...(cur.last||{}),[taskId]:entry};const hist={...(cur.hist||{})};hist[taskId]=[...(hist[taskId]||[]),entry].slice(-30);
+  await put("routine",shipId,{ship:shipId,last,hist});toast("Marked done");
+}
+function bindRoutine(){
+  const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
+  const s=state.ships.find(x=>x.id===ui.rtShip)||state.ships[0];if(!s)return;
+  const sh=$("#rt_ship");sh&&sh.addEventListener("change",e=>{ui.rtShip=e.target.value;keepUI();render()});
+  on("[data-rtf]","click",e=>{ui.rtFreq=e.currentTarget.dataset.rtf;render()});
+  on("[data-rtopen]","click",e=>{const id=e.currentTarget.dataset.rtopen;ui.rtOpen[id]=!ui.rtOpen[id];render()});
+  on("[data-rtdone]","click",e=>markRoutine(s.id,e.currentTarget.dataset.rtdone));
+  const c=$("#rtCopy");c&&c.addEventListener("click",()=>copyText(routineText(s.id)));
+}
+
 /* ================== DATA LAYER ================== */
-const state = {ships:[],checks:{},incidents:[],mode:"loading"};
+const state = {ships:[],checks:{},incidents:[],routine:{},mode:"loading"};
 let db=null, downloads=null;
 const LKEY="pruva-siber-local";
-function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LKEY)||"null");if(d){state.ships=d.ships||[];state.checks=d.checks||{};state.incidents=d.incidents||[];}}catch(e){}}
-function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify({ships:state.ships,checks:state.checks,incidents:state.incidents}))}catch(e){}}
+const EXAMPLE={
+  ships:[{id:"ship-example1",name:"EXAMPLE – MV Marmara Star",imo:"9876543",flag:"Malta",type:"Bulk carrier",eu:true,e26:true,example:true,created:"2026-11-04T07:00:00.000Z",
+    equipment:[
+      {name:"ECDIS No.1",type:"ecdis",vendor:"Example maker",sw:"v5.3",net:"Bridge network",updated:"2026-09-12",remote:true},
+      {name:"GPS receiver No.1",type:"gnss",vendor:"Example maker",sw:"fw 3.0",net:"Bridge network",updated:"2026-04-02",remote:false},
+      {name:"GMDSS console",type:"gmdss",vendor:"Example maker",sw:"",net:"Bridge network",updated:"2025-12-10",remote:false},
+      {name:"Main engine remote control",type:"propulsion",vendor:"Example maker",sw:"fw 2.1",net:"Engine network",updated:"2026-03-02",remote:false},
+      {name:"Engine alarm & monitoring",type:"ams",vendor:"Example maker",sw:"v8",net:"Engine network",updated:"2026-03-02",remote:true},
+      {name:"Loading computer",type:"cargo",vendor:"Example maker",sw:"v12",net:"Office network",updated:"2026-05-20",remote:false},
+      {name:"VSAT terminal and firewall",type:"vsat",vendor:"Example maker",sw:"fw 8.4",net:"Gateway",updated:"2026-10-01",remote:true},
+      {name:"Master's office computer",type:"it",vendor:"",sw:"Windows 11",net:"Office network",updated:"2026-10-15",remote:true},
+      {name:"Crew Wi-Fi",type:"crew",vendor:"",sw:"",net:"Crew network",updated:"2026-06-01",remote:true}]}],
+  checks:{"ship-example1":{ship:"ship-example1",answers:{
+    I1:{status:"ok",ev:"Equipment list rev.3, 12 Sep 2026",verified:true,by:"ship",at:"2026-10-20T08:00:00.000Z"},
+    P4:{status:"part",ev:"Locked on the bridge, no locks in the engine control room",req:"Send a photo of the port locks in the ECR",by:"company",at:"2026-10-22T10:00:00.000Z"},
+    P9:{status:"no",ev:"Loading computer is on the office network",by:"ship",at:"2026-10-21T09:00:00.000Z"},
+    R4:{status:"ok",ev:"Drill held 15 Oct 2026",by:"ship",at:"2026-10-15T12:00:00.000Z"},
+    T3:{status:"ok",ev:"Crew knows the SSO is the Chief Officer",by:"ship",at:"2026-10-15T12:00:00.000Z"}}}},
+  incidents:[]
+};
+function exampleRoutine(id){
+  const ago=d=>{const x=new Date();x.setDate(x.getDate()-d);x.setHours(9,0,0,0);return x.toISOString()};
+  const mk=(d,note="")=>({at:ago(d),by:"ship",note});
+  const last={d_gps:mk(0,"GPS matches radar"),d_usb:mk(1),d_alarm:mk(0),d_backup:mk(3,"Backup failed on Sunday"),
+    w_av:mk(5),w_cab:mk(9),w_remote:mk(2),m_accounts:mk(40),m_restore:mk(27),m_inventory:mk(12),m_talk:mk(20),y_training:mk(200),y_drill:mk(350),y_manual:mk(400)};
+  const hist={};Object.entries(last).forEach(([k,v])=>hist[k]=[v]);
+  return {[id]:{ship:id,last,hist}};
+}
+function loadLocal(){try{const raw=localStorage.getItem(LKEY);const d=JSON.parse(raw||"null");if(d){state.ships=d.ships||[];state.checks=d.checks||{};state.incidents=d.incidents||[];state.routine=d.routine||{};return}
+  if(raw===null&&!window.claude){const ex=JSON.parse(JSON.stringify(EXAMPLE));state.ships=ex.ships;state.checks=ex.checks;state.incidents=ex.incidents;state.routine=exampleRoutine("ship-example1");saveLocal()}}catch(e){}}
+function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify({ships:state.ships,checks:state.checks,incidents:state.incidents,routine:state.routine}))}catch(e){}}
 function uid(p){return p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 async function put(coll,id,obj){
   if(db){try{await db.collection(coll).doc(id).set(obj)}catch(e){toast(e.code==="invalid_argument"?"You don't have permission to change this.":"Couldn't save: "+(e.message||e.code));}}
@@ -728,7 +852,7 @@ async function del(coll,id){
   else{applyLocal(coll,id,null);saveLocal();render();}
 }
 function applyLocal(coll,id,obj){
-  if(coll==="checks"){if(obj)state.checks[id]=obj;else delete state.checks[id];return}
+  if(coll==="checks"||coll==="routine"){const m=state[coll];if(obj)m[id]=obj;else delete m[id];return}
   const arr=coll==="ships"?state.ships:state.incidents;const i=arr.findIndex(x=>x.id===id);
   if(obj){obj={...obj,id};if(i>=0)arr[i]=obj;else arr.push(obj)}else if(i>=0)arr.splice(i,1);
 }
@@ -739,13 +863,14 @@ async function init(){
   try{downloads=await (window.claude?.use?.("downloads")??null)}catch(e){downloads=null}
   try{db=await (window.claude?.use?.("db")??null)}catch(e){db=null}
   if(!db){clearTimeout(timer);state.mode="local";loadLocal();setConn("Local mode · saved in this browser only");render();return}
-  let got=0;const done=()=>{if(++got>=3){clearTimeout(timer);state.mode="db";setConn("Shared with company · live");}render()};
+  let got=0;const done=()=>{if(++got>=4){clearTimeout(timer);state.mode="db";setConn("Shared with company · live");}render()};
   const onErr=e=>{setConn("Connection problem: "+e.code)};
   const firsts={};
   const sub=(name,fn)=>db.collection(name).onSnapshot(s=>{fn(s);if(!firsts[name]&&!s.metadata.fromCache){firsts[name]=1;done()}else render()},onErr);
   sub("ships",s=>{state.ships=s.docs.map(d=>({...d.data(),id:d.id}))});
   sub("checks",s=>{const o={};s.docs.forEach(d=>o[d.id]=d.data());state.checks=o});
   sub("incidents",s=>{state.incidents=s.docs.map(d=>({...d.data(),id:d.id}))});
+  sub("routine",s=>{const o={};s.docs.forEach(d=>o[d.id]=d.data());state.routine=o});
 }
 
 /* ================== HELPERS ================== */
@@ -785,12 +910,12 @@ async function saveBlob(name,data){
 const saveFile=(name,text)=>saveBlob(name,text);
 
 /* ================== VIEW STATE ================== */
-const views={panel:vHome,playbook:vGuide,olay:vIncidents,kontrol:vChecks,filo:vShips,mevzuat:vRules};
-const CRUMB={panel:"Home",playbook:"Emergency guide",olay:"Incident reports",kontrol:"Ship checklist",filo:"Ships & equipment",mevzuat:"Rules & references"};
-let ui={ship:null,eq:"it",sc:"ransomware",marsec:1,inc:null,ctlShip:null,ctlFilter:"all",done:{},params:{},plat:{},linkInc:"",open:{},openIT:{}};
+const views={panel:vHome,rutin:vRoutine,playbook:vGuide,olay:vIncidents,kontrol:vChecks,filo:vShips,mevzuat:vRules};
+const CRUMB={panel:"Home",rutin:"Routine checks",playbook:"Emergency guide",olay:"Incident reports",kontrol:"Ship checklist",filo:"Ships & equipment",mevzuat:"Rules & references"};
+let ui={ship:null,eq:"it",sc:"ransomware",marsec:1,inc:null,ctlShip:null,ctlFilter:"all",done:{},params:{},plat:{},linkInc:"",open:{},openIT:{},rtShip:null,rtFreq:"todo",rtOpen:{}};
 try{Object.assign(ui,JSON.parse(sessionStorage.getItem("pruva-ui")||"{}"))}catch(e){}
 if(!SCEN[ui.sc])ui.sc="ransomware"; if(!EQUIP[ui.eq])ui.eq=SCEN[ui.sc].eq;
-function keepUI(){try{sessionStorage.setItem("pruva-ui",JSON.stringify({ship:ui.ship,eq:ui.eq,sc:ui.sc,marsec:ui.marsec,ctlShip:ui.ctlShip,params:ui.params,plat:ui.plat,linkInc:ui.linkInc,done:ui.done}))}catch(e){}}
+function keepUI(){try{sessionStorage.setItem("pruva-ui",JSON.stringify({ship:ui.ship,eq:ui.eq,sc:ui.sc,marsec:ui.marsec,ctlShip:ui.ctlShip,params:ui.params,plat:ui.plat,linkInc:ui.linkInc,done:ui.done,rtShip:ui.rtShip}))}catch(e){}}
 function current(){const h=location.hash.slice(1);return views[h]?h:"panel"}
 function render(){
   const v=current();
@@ -800,6 +925,7 @@ function render(){
   bind(v);
   const cr=document.getElementById("crumb");if(cr)cr.textContent=CRUMB[v];
   const ob=state.incidents.filter(i=>!isClosed(i)).length,bd=document.getElementById("incBadge");if(bd){bd.hidden=!ob;bd.textContent=ob}
+  const ro=state.ships.reduce((t,s)=>t+routineSummary(s.id).over,0),rb=document.getElementById("rtBadge");if(rb){rb.hidden=!ro;rb.textContent=ro}
   if(fid){const el=document.getElementById(fid);if(el&&el.tagName!=="BUTTON")el.focus()}
 }
 window.addEventListener("hashchange",()=>{render();window.scrollTo(0,0)});
@@ -818,6 +944,8 @@ function vHome(){
     ${late.length?`<div class="notice warn"><b>A report to the authorities is late:</b> ${late.map(x=>`${esc(x.i.title||"Incident")} – ${x.d.name}`).join("; ")}. <a href="#olay">Open incident reports</a></div>`:""}
     ${open.length?`<section class="block"><h2>Open incidents</h2><ol class="list">${open.map(i=>{const g=i.guideDone?Object.keys(i.guideDone).length:0;const n=deadlines(i).find(d=>!d.sent);
       return `<li><a href="#olay" data-openinc="${i.id}" class="li-main"><b>${esc(i.title||"Untitled incident")}</b><span class="muted">${esc(shipName(i.ship))} · noticed ${fmtUTC(i.detected)} · ${g} steps done</span></a>${n?`<span class="pill ${n.late?'bad':'warn'}">${n.name}: ${rel(n.due)}</span>`:""}</li>`}).join("")}</ol></section>`:""}
+    ${state.ships.length?`<section class="block"><div class="steps-h"><h2>Routine checks</h2><a class="btn small" href="#rutin">Open routine checks</a></div><ol class="list">${state.ships.map(s=>{const r=routineSummary(s.id);
+      return `<li><div class="li-main"><b>${esc(s.name)}</b><span class="muted">Daily, weekly, monthly and yearly checks</span></div>${r.over?`<span class="pill bad">${r.over} overdue</span>`:""}${r.due?`<span class="pill warn">${r.due} due now</span>`:""}${!r.over&&!r.due?'<span class="pill ok">All up to date</span>':""}<a class="btn small ${r.over?'primary':''}" href="#rutin" data-rtship="${s.id}">Do checks</a></li>`}).join("")}</ol></section>`:""}
     <section class="block"><h2>Your ships</h2>
     ${state.ships.length?`<ol class="list">${state.ships.map(s=>{const sc=score(s.id);const rc=sc.pct>=80?"ok":sc.pct>=50?"warn":"bad";
       return `<li><div class="li-main"><b>${esc(s.name)}</b><span class="muted">IMO ${esc(s.imo||"—")} · ${esc(s.flag||"—")}${s.example?" · example record":""}</span></div>
@@ -826,6 +954,7 @@ function vHome(){
     <section class="block"><h2>How this app works</h2><ol class="howto">
       <li><b>Emergency guide</b> — when something goes wrong, choose what you see. The app gives you numbered steps. Do them in order and tick each one.</li>
       <li><b>Incident reports</b> — every step you tick is written into the report with the time. The company uses it to inform the authorities.</li>
+      <li><b>Routine checks</b> — small daily, weekly, monthly and yearly checks. The app shows what is due and what is overdue.</li>
       <li><b>Ship checklist</b> — simple yes/no questions that inspectors ask. The ship answers, the company checks and signs off.</li>
       <li><b>Ships &amp; equipment</b> — the list of computers and computer-controlled equipment on board.</li></ol></section>`;
 }
@@ -1070,8 +1199,10 @@ function collectInc(base){
     actions:v("in_act").value,cause:v("in_cause").value,lessons:v("in_less").value,authority:v("in_auth").value,status:v("in_status").value,updated:new Date().toISOString()};
 }
 function bind(v){
+  if(v==="rutin")bindRoutine();
   const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
   on("[data-goship]","click",e=>{ui.ctlShip=e.currentTarget.dataset.goship;keepUI()});
+  on("[data-rtship]","click",e=>{ui.rtShip=e.currentTarget.dataset.rtship;keepUI()});
   on("[data-openinc]","click",e=>{e.preventDefault();ui.inc=e.currentTarget.dataset.openinc;if(location.hash!=="#olay")location.hash="olay";else render()});
   if(v==="playbook"&&state.ships.length){
     const s=curShip();
