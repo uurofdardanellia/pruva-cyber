@@ -319,6 +319,25 @@ details.it>*+*{margin-top:10px}
 .rdetail p{margin:0}
 .rbtn{align-self:center;white-space:nowrap}
 @media (max-width:860px){.ritem{grid-template-columns:14px minmax(0,1fr)}.rbtn{grid-column:2;justify-self:start}}
+
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.photo-btn{cursor:pointer}
+input[type="file"]:focus-visible+*{outline:2px solid var(--accent)}
+.photos{display:flex;flex-wrap:wrap;gap:8px}
+.ph{margin:0;position:relative;width:84px}
+.ph-img{display:block;width:84px;height:64px;padding:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;cursor:zoom-in;background:var(--soft)}
+.ph-img img{width:100%;height:100%;object-fit:cover;display:block}
+.ph figcaption{font:.66rem var(--f-mono);color:var(--faint);margin-top:2px}
+.ph-del{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;line-height:1;font-size:14px;box-shadow:var(--shadow)}
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(5,12,18,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(20px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lightbox img{max-width:100%;max-height:82vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.eqlist>li{display:block}
+.eq-head{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(90px,.7fr) minmax(100px,.7fr) auto;gap:10px 18px;align-items:center}
+.eq-actions{grid-column:1/-1}
+.eq-sw{display:flex;flex-direction:column;gap:3px;min-width:0}
+.eq-sw b{font-size:.88rem;overflow-wrap:anywhere}
+.eqf{margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}
+@media (max-width:860px){.eq-head{grid-template-columns:1fr 1fr}.eq-head .li-main{grid-column:1/-1}}
 </style>
 </head>
 <body>
@@ -773,8 +792,9 @@ function vRoutine(){
       return `<li class="ritem r-${st.st}"><span class="rdot" aria-hidden="true"></span>
         <div class="rmain"><button type="button" class="rtitle" data-rtopen="${t.id}" aria-expanded="${!!op}">${esc(t.t)}</button>
           <div class="rmeta"><span class="pill ${st.st==="over"?"bad":st.st==="due"?"warn":"ok"}">${st.label}</span><span class="muted small">${esc(t.who)}</span>${st.last?`<span class="muted small">Last: ${st.last.at.slice(0,10)} · ${byLabel(st.last.by)}</span>`:""}<span class="muted small">Due: ${st.due}</span></div>
-          ${op?`<div class="rdetail"><p>${esc(t.h)}</p><label class="f">Note (optional)<input id="rn_${t.id}" placeholder="e.g. all OK / found unknown USB on ECR PC"></label><div class="gref">Rule: ${esc(t.ref)}</div>
-            ${hist.length?`<div><div class="eyebrow">History</div><ol class="done-list">${hist.slice(-8).reverse().map(h=>`<li><span class="mono muted">${h.at.slice(0,16).replace("T"," ")}</span> ${byLabel(h.by)}${h.note?" — "+esc(h.note):""}</li>`).join("")}</ol></div>`:""}</div>`:""}
+          ${op?`<div class="rdetail"><p>${esc(t.h)}</p><label class="f">Note (optional)<input id="rn_${t.id}" placeholder="e.g. all OK / found unknown USB on ECR PC" value="${esc((ui.rtNote||{})[t.id]||"")}" data-rtnote="${t.id}"></label>
+            <div class="row">${photoInput("rp_"+t.id,"data-rtphoto",t.id)}<span class="muted small">The photo is saved with the next "Mark done".</span></div>${photoStrip(ui.rtPhoto[t.id],"data-rtphdel-"+t.id)}<div class="gref">Rule: ${esc(t.ref)}</div>
+            ${hist.length?`<div><div class="eyebrow">History</div><ol class="done-list">${hist.slice(-8).reverse().map(h=>`<li><span class="mono muted">${h.at.slice(0,16).replace("T"," ")}</span> ${byLabel(h.by)}${h.note?" — "+esc(h.note):""}${photoStrip(h.photos)}</li>`).join("")}</ol></div>`:""}</div>`:""}
         </div>
         <button class="btn ${st.st==="ok"?"ghost":"primary"} rbtn" data-rtdone="${t.id}" ${st.st==="ok"&&t.f==="daily"?"disabled":""}>${st.st==="ok"?"Done again":"Mark done"}</button></li>`}).join("")}</ol></section>`}).join("");
   return `<div class="head"><div><h1>Routine checks</h1><p>Small checks that keep the ship's computers safe. Do each one when it is due and press <b>Mark done</b>. Red means overdue, yellow means due now.</p></div></div>
@@ -793,8 +813,9 @@ function routineText(shipId){
 async function markRoutine(shipId,taskId){
   const cur=state.routine[shipId]||{ship:shipId,last:{},hist:{}};const now=new Date().toISOString();
   const noteEl=document.getElementById("rn_"+taskId);const note=noteEl?noteEl.value.trim():"";
-  const entry={at:now,by:role,note};
+  const photos=ui.rtPhoto[taskId]||[];const entry={at:now,by:role,note};if(photos.length)entry.photos=photos;
   const last={...(cur.last||{}),[taskId]:entry};const hist={...(cur.hist||{})};hist[taskId]=[...(hist[taskId]||[]),entry].slice(-30);
+  ui.rtPhoto[taskId]=[];if(ui.rtNote)delete ui.rtNote[taskId];
   await put("routine",shipId,{ship:shipId,last,hist});toast("Marked done");
 }
 function bindRoutine(){
@@ -804,7 +825,91 @@ function bindRoutine(){
   on("[data-rtf]","click",e=>{ui.rtFreq=e.currentTarget.dataset.rtf;render()});
   on("[data-rtopen]","click",e=>{const id=e.currentTarget.dataset.rtopen;ui.rtOpen[id]=!ui.rtOpen[id];render()});
   on("[data-rtdone]","click",e=>markRoutine(s.id,e.currentTarget.dataset.rtdone));
+  on("[data-rtnote]","input",e=>{ui.rtNote={...(ui.rtNote||{}),[e.target.dataset.rtnote]:e.target.value}});
+  on("[data-rtphoto]","change",async e=>{const id=e.target.dataset.rtphoto;const f=e.target.files[0];if(!f)return;toast("Adding photo…");
+    try{const p=await makePhoto(f);ui.rtPhoto[id]=[...(ui.rtPhoto[id]||[]),p].slice(0,MAX_PHOTOS);render()}catch(err){photoError(err)}});
+  ROUTINE.forEach(t=>on(`[data-rtphdel-${t.id}]`,"click",e=>{const i=+e.currentTarget.getAttribute("data-rtphdel-"+t.id);const ph=[...(ui.rtPhoto[t.id]||[])];const [g]=ph.splice(i,1);dropAsset(g);ui.rtPhoto[t.id]=ph;render()}));
   const c=$("#rtCopy");c&&c.addEventListener("click",()=>copyText(routineText(s.id)));
+}
+
+/* ================== PHOTOS ================== */
+let assets=null;
+const MAX_PHOTOS=6;
+function canAddPhotos(){return !!assets||!window.claude}
+function resizeImage(file,max,q){
+  return new Promise((res,rej)=>{const img=new Image();const url=URL.createObjectURL(file);
+    img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);c.toBlob(b=>b?res(b):rej(new Error("Could not read the photo")),"image/jpeg",q)};
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("This file is not a photo the browser can open"))};img.src=url});
+}
+function blobToDataURL(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b)})}
+async function makePhoto(file){
+  if(!file||!/^image\//.test(file.type))throw new Error("Choose a photo (JPG or PNG).");
+  if(assets){const b=await resizeImage(file,1600,.8);const up=await assets.upload(b,{type:"image/jpeg"});return {id:up.id,at:new Date().toISOString(),by:role}}
+  if(!window.claude){const b=await resizeImage(file,1024,.62);return {data:await blobToDataURL(b),at:new Date().toISOString(),by:role}}
+  throw new Error("You can't add photos in this view.");
+}
+const photoSrc=p=>p.id?"/_blob/"+p.id:p.data;
+function photoStrip(list,delAttr){
+  if(!list||!list.length)return"";
+  return `<div class="photos">${list.map((p,i)=>`<figure class="ph"><button type="button" class="ph-img" data-viewphoto="${esc(photoSrc(p))}" aria-label="Open photo"><img src="${esc(photoSrc(p))}" alt="Photo ${i+1}" loading="lazy"></button>${delAttr?`<button type="button" class="ph-del" ${delAttr}="${i}" aria-label="Remove photo">×</button>`:""}<figcaption>${(p.at||"").slice(0,10)}</figcaption></figure>`).join("")}</div>`;
+}
+function photoInput(id,attr,val){
+  if(!canAddPhotos())return `<span class="muted small">Photos can only be added by people who can use this page.</span>`;
+  return `<label class="btn small photo-btn" for="${id}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Add photo</label><input type="file" id="${id}" ${attr}="${esc(val)}" accept="image/*" capture="environment" class="visually-hidden">`;
+}
+function openPhoto(src){
+  const o=document.createElement("div");o.className="lightbox";o.innerHTML=`<img src="${esc(src)}" alt="Photo"><button type="button" class="btn" aria-label="Close">Close</button>`;
+  const close=()=>o.remove();o.addEventListener("click",e=>{if(e.target===o||e.target.tagName==="BUTTON")close()});document.addEventListener("keydown",function k(e){if(e.key==="Escape"){close();document.removeEventListener("keydown",k)}});
+  document.body.appendChild(o);o.querySelector("button").focus();
+}
+async function dropAsset(p){if(p&&p.id&&assets){try{await assets.delete(p.id)}catch(e){}}}
+function photoError(e){toast(e.code==="quota_exceeded"?"Photo storage is full. Remove old photos first.":e.code==="too_large"?"The photo is too large.":(e.message||"Couldn't add the photo."))}
+
+/* ================== SOFTWARE & UPDATES ================== */
+const ageDays=d=>d?Math.floor((Date.now()-new Date(d+"T12:00:00"))/864e5):null;
+function ageBadge(d){const a=ageDays(d);if(a===null)return '<span class="pill">Update date unknown</span>';
+  const txt=a<1?"updated today":a<60?`updated ${a} days ago`:a<730?`updated ${Math.round(a/30)} months ago`:`updated ${Math.round(a/365)} years ago`;
+  return `<span class="pill ${a>365?"bad":a>180?"warn":"ok"}">${txt}</span>`}
+function eqRow(s,e,i){
+  const mode=ui.eqEdit&&ui.eqEdit.i===i?ui.eqEdit.mode:null;const ups=e.updates||[];const op=ui.eqOpen[i];
+  let form="";
+  if(mode==="update")form=`<form class="form eqf" data-equpd="${i}">
+      <label class="f">New software version<input id="eu_sw_${i}" class="mono" required placeholder="e.g. 5.4.1" value=""></label>
+      <label class="f">Date of update<input id="eu_dt_${i}" type="date" value="${todayStr()}" required></label>
+      <label class="f">Who did it<input id="eu_by_${i}" placeholder="e.g. ETO, maker's engineer"></label>
+      <label class="f wide">Note<input id="eu_nt_${i}" placeholder="e.g. security update from maker, ENC update"></label>
+      <div class="row wide"><button class="btn primary" type="submit">Save update</button><button class="btn ghost" type="button" data-eqcancel>Cancel</button></div></form>`;
+  if(mode==="edit")form=`<form class="form eqf" data-eqsave="${i}">
+      <label class="f">Name<input id="ee_name_${i}" value="${esc(e.name)}" required></label>
+      <label class="f">What kind<select id="ee_type_${i}">${Object.entries(EQUIP).filter(([k])=>k!=="unknown").map(([k,v])=>`<option value="${k}" ${k===e.type?"selected":""}>${v.label}</option>`).join("")}</select></label>
+      <label class="f">Maker / model<input id="ee_vendor_${i}" value="${esc(e.vendor||"")}"></label>
+      <label class="f">Software version<input id="ee_sw_${i}" class="mono" value="${esc(e.sw||"")}"></label>
+      <label class="f">Last updated<input id="ee_upd_${i}" type="date" value="${esc(e.updated||"")}"></label>
+      <label class="f">Network<input id="ee_net_${i}" value="${esc(e.net||"")}"></label>
+      <label class="chk wide"><input type="checkbox" id="ee_remote_${i}" ${e.remote?"checked":""}> Connects to the internet, or a service company can log in remotely</label>
+      <div class="row wide"><button class="btn primary" type="submit">Save</button><button class="btn ghost" type="button" data-eqcancel>Cancel</button><button class="btn ghost" type="button" data-deleq="${i}" style="margin-left:auto">Remove equipment</button></div></form>`;
+  return `<li class="eqrow"><div class="eq-head"><div class="li-main"><b>${esc(e.name)}</b><span class="muted">${esc(EQUIP[e.type]?.label||e.type)}${e.vendor?" · "+esc(e.vendor):""}${e.net?" · "+esc(e.net):""}</span></div>
+      <div class="eq-sw"><span class="eyebrow">Software</span><b class="mono">${esc(e.sw||"—")}</b></div>
+      <div class="eq-sw"><span class="eyebrow">Last update</span><b class="mono">${esc(e.updated||"—")}</b></div>
+      <div class="row">${ageBadge(e.updated)}${e.remote?'<span class="pill warn">Internet / remote</span>':""}</div>
+      <div class="row eq-actions"><button class="btn small primary" data-equpdopen="${i}">Record update</button><button class="btn small ghost" data-eqeditopen="${i}">Edit</button>${ups.length?`<button class="btn small ghost" data-eqhist="${i}" aria-expanded="${!!op}">History (${ups.length})</button>`:""}</div></div>
+    ${form}
+    ${op&&ups.length?`<ol class="timeline" style="margin-top:6px">${[...ups].reverse().map(u=>`<li><span class="mono">${esc(u.date)}</span><span><b class="mono">${esc(u.from||"—")} → ${esc(u.to)}</b>${u.who?" · "+esc(u.who):""}${u.note?" · "+esc(u.note):""}</span></li>`).join("")}</ol>`:""}</li>`;
+}
+function bindEquipment(s){
+  const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
+  const eqs=()=>[...(s.equipment||[])];
+  on("[data-equpdopen]","click",e=>{ui.eqEdit={i:+e.currentTarget.dataset.equpdopen,mode:"update"};render();const f=document.getElementById("eu_sw_"+ui.eqEdit.i);f&&f.focus()});
+  on("[data-eqeditopen]","click",e=>{ui.eqEdit={i:+e.currentTarget.dataset.eqeditopen,mode:"edit"};render()});
+  on("[data-eqcancel]","click",()=>{ui.eqEdit=null;render()});
+  on("[data-eqhist]","click",e=>{const i=+e.currentTarget.dataset.eqhist;ui.eqOpen[i]=!ui.eqOpen[i];render()});
+  on("[data-equpd]","submit",e=>{e.preventDefault();const i=+e.currentTarget.dataset.equpd;const list=eqs();const q={...list[i]};const v=id=>document.getElementById(id+"_"+i).value.trim();
+    const u={date:v("eu_dt"),from:q.sw||"",to:v("eu_sw"),who:v("eu_by"),note:v("eu_nt"),at:new Date().toISOString(),by:role};
+    q.updates=[...(q.updates||[]),u].slice(-30);q.sw=u.to;q.updated=u.date;list[i]=q;ui.eqEdit=null;ui.eqOpen[i]=true;put("ships",s.id,{...strip(s),equipment:list});toast("Update recorded")});
+  on("[data-eqsave]","submit",e=>{e.preventDefault();const i=+e.currentTarget.dataset.eqsave;const list=eqs();const v=id=>document.getElementById(id+"_"+i);
+    list[i]={...list[i],name:v("ee_name").value.trim(),type:v("ee_type").value,vendor:v("ee_vendor").value.trim(),sw:v("ee_sw").value.trim(),updated:v("ee_upd").value,net:v("ee_net").value.trim(),remote:v("ee_remote").checked};
+    ui.eqEdit=null;put("ships",s.id,{...strip(s),equipment:list});toast("Saved")});
 }
 
 /* ================== DATA LAYER ================== */
@@ -841,7 +946,7 @@ function exampleRoutine(id){
 }
 function loadLocal(){try{const raw=localStorage.getItem(LKEY);const d=JSON.parse(raw||"null");if(d){state.ships=d.ships||[];state.checks=d.checks||{};state.incidents=d.incidents||[];state.routine=d.routine||{};return}
   if(raw===null&&!window.claude){const ex=JSON.parse(JSON.stringify(EXAMPLE));state.ships=ex.ships;state.checks=ex.checks;state.incidents=ex.incidents;state.routine=exampleRoutine("ship-example1");saveLocal()}}catch(e){}}
-function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify({ships:state.ships,checks:state.checks,incidents:state.incidents,routine:state.routine}))}catch(e){}}
+function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify({ships:state.ships,checks:state.checks,incidents:state.incidents,routine:state.routine}));return true}catch(e){toast("This browser's storage is full. Remove some photos.");return false}}
 function uid(p){return p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 async function put(coll,id,obj){
   if(db){try{await db.collection(coll).doc(id).set(obj)}catch(e){toast(e.code==="invalid_argument"?"You don't have permission to change this.":"Couldn't save: "+(e.message||e.code));}}
@@ -862,6 +967,7 @@ async function init(){
   const timer=setTimeout(()=>{if(state.mode==="loading"){state.mode="local";loadLocal();setConn("Local mode · saved in this browser only");render();}},10000);
   try{downloads=await (window.claude?.use?.("downloads")??null)}catch(e){downloads=null}
   try{db=await (window.claude?.use?.("db")??null)}catch(e){db=null}
+  try{assets=await (window.claude?.use?.("assets")??null)}catch(e){assets=null}
   if(!db){clearTimeout(timer);state.mode="local";loadLocal();setConn("Local mode · saved in this browser only");render();return}
   let got=0;const done=()=>{if(++got>=4){clearTimeout(timer);state.mode="db";setConn("Shared with company · live");}render()};
   const onErr=e=>{setConn("Connection problem: "+e.code)};
@@ -912,7 +1018,7 @@ const saveFile=(name,text)=>saveBlob(name,text);
 /* ================== VIEW STATE ================== */
 const views={panel:vHome,rutin:vRoutine,playbook:vGuide,olay:vIncidents,kontrol:vChecks,filo:vShips,mevzuat:vRules};
 const CRUMB={panel:"Home",rutin:"Routine checks",playbook:"Emergency guide",olay:"Incident reports",kontrol:"Ship checklist",filo:"Ships & equipment",mevzuat:"Rules & references"};
-let ui={ship:null,eq:"it",sc:"ransomware",marsec:1,inc:null,ctlShip:null,ctlFilter:"all",done:{},params:{},plat:{},linkInc:"",open:{},openIT:{},rtShip:null,rtFreq:"todo",rtOpen:{}};
+let ui={ship:null,eq:"it",sc:"ransomware",marsec:1,inc:null,ctlShip:null,ctlFilter:"all",done:{},params:{},plat:{},linkInc:"",open:{},openIT:{},rtShip:null,rtFreq:"todo",rtOpen:{},eqEdit:null,eqOpen:{},rtPhoto:{}};
 try{Object.assign(ui,JSON.parse(sessionStorage.getItem("pruva-ui")||"{}"))}catch(e){}
 if(!SCEN[ui.sc])ui.sc="ransomware"; if(!EQUIP[ui.eq])ui.eq=SCEN[ui.sc].eq;
 function keepUI(){try{sessionStorage.setItem("pruva-ui",JSON.stringify({ship:ui.ship,eq:ui.eq,sc:ui.sc,marsec:ui.marsec,ctlShip:ui.ctlShip,params:ui.params,plat:ui.plat,linkInc:ui.linkInc,done:ui.done,rtShip:ui.rtShip}))}catch(e){}}
@@ -1121,7 +1227,9 @@ function vChecks(){
         ${r.req?`<div class="notice small"><b>Note from company:</b> ${esc(r.req)}</div>`:""}
         ${r.verified?'<span class="pill ok">Checked by company</span>':r.returned?'<span class="pill bad">Company asks for more</span>':""}</div>
         <div class="answer"><div class="seg ans" role="radiogroup" aria-label="Answer">${["ok","part","no","na"].map(k=>`<button type="button" role="radio" aria-checked="${r.status===k}" class="a-${k}" data-ans="${c.id}:${k}">${STATUS[k][0]}</button>`).join("")}</div>
-          <input id="ce_${c.id}" data-cev="${c.id}" placeholder="What proves it? (document, photo…)" value="${esc(r.ev||"")}">
+          <input id="ce_${c.id}" data-cev="${c.id}" placeholder="What proves it? (document name, short note)" value="${esc(r.ev||"")}">
+          <div class="row">${(r.photos||[]).length<MAX_PHOTOS?photoInput("cp_"+c.id,"data-cphoto",c.id):`<span class="muted small">Up to ${MAX_PHOTOS} photos</span>`}${(r.photos||[]).length?`<span class="muted small">${r.photos.length} photo${r.photos.length>1?"s":""}</span>`:""}</div>
+          ${photoStrip(r.photos,"data-cphdel-"+c.id)}
           ${role==="company"&&r.status?`<div class="row"><input id="cr_${c.id}" data-creq="${c.id}" placeholder="Note to the ship" value="${esc(r.req||"")}"><button class="btn small" data-cver="${c.id}">${r.verified?"Undo check":"Mark as checked"}</button><button class="btn small ghost" data-cret="${c.id}">Ask for more</button></div>`:""}</div></li>`}).join("")}</ol></section>`}).join("");
   return `<div class="head"><div><h1>Ship checklist</h1><p>${role==="ship"?"Answer each question with Yes, Partly or No, and write what proves it. The company checks your answers.":"The ship answers; you check each answer, sign it off or ask for more."} These are the questions inspectors ask about cyber security.</p></div></div>
     <section class="block"><div class="row" style="justify-content:space-between;align-items:flex-end;gap:16px">
@@ -1134,7 +1242,7 @@ function vChecks(){
 function auditText(shipId){
   const s=state.ships.find(x=>x.id===shipId);const a=(state.checks[shipId]||{}).answers||{};const sc=score(shipId);
   let t=`CYBER SECURITY CHECKLIST — ${s.name} (IMO ${s.imo||"-"})\nDate: ${fmtUTC(new Date().toISOString())}\nYes ${sc.ok} · Partly ${sc.part} · No ${sc.no} · Not answered ${sc.open} · Waiting for company check ${sc.unver}\nBased on: MARSEC Doc. 9209 Annex A, IACS UR E26, MSC-FAL.1/Circ.3/Rev.4\n`;
-  [...new Set(CONTROLS.map(c=>c.g))].forEach(g=>{t+=`\n== ${g.toUpperCase()} ==\n`;CONTROLS.filter(c=>c.g===g).forEach(c=>{const r=a[c.id]||{};t+=`[${STATUS[r.status||""][0]}${r.verified?", checked":""}] ${c.q}\n   Proof: ${r.ev||"-"}${r.req?` · Company note: ${r.req}`:""} · Rule: ${c.ref}\n`})});
+  [...new Set(CONTROLS.map(c=>c.g))].forEach(g=>{t+=`\n== ${g.toUpperCase()} ==\n`;CONTROLS.filter(c=>c.g===g).forEach(c=>{const r=a[c.id]||{};t+=`[${STATUS[r.status||""][0]}${r.verified?", checked":""}] ${c.q}\n   Proof: ${r.ev||"-"}${(r.photos||[]).length?` (+${r.photos.length} photo${r.photos.length>1?"s":""})`:""}${r.req?` · Company note: ${r.req}`:""} · Rule: ${c.ref}\n`})});
   return t;
 }
 
@@ -1151,8 +1259,9 @@ function vShips(){
       <label class="chk wide"><input type="checkbox" id="sh_eu" ${s.eu?"checked":""}> <span>EU rules apply <span class="muted">(EU flag, or the company is in the EU)</span></span></label>
       <label class="chk wide"><input type="checkbox" id="sh_e26" ${s.e26?"checked":""}> <span>Built under IACS UR E26 <span class="muted">(building contract on or after 1 July 2024)</span></span></label>
       <div class="row wide"><button class="btn primary" type="submit">Save</button><button class="btn ghost" type="button" data-delship="${s.id}">Delete ship</button></div></form></section>
-    <section class="block"><h2>Equipment on board <span class="muted" style="font-weight:400;font-size:.9rem">(${(s.equipment||[]).length})</span></h2>
-      ${(s.equipment||[]).length?`<ol class="list">${s.equipment.map((e,i)=>`<li><div class="li-main"><b>${esc(e.name)}</b><span class="muted">${esc(EQUIP[e.type]?.label||e.type)}${e.vendor?" · "+esc(e.vendor):""}${e.sw?" · "+esc(e.sw):""}${e.net?" · "+esc(e.net):""}</span></div>${e.remote?'<span class="pill warn">Internet / remote access</span>':""}<button class="btn small ghost" data-deleq="${i}">Remove</button></li>`).join("")}</ol>`:`<p class="muted">No equipment yet.</p>`}
+    <section class="block"><div class="steps-h"><h2>Equipment, software &amp; updates <span class="muted" style="font-weight:400;font-size:.9rem">(${(s.equipment||[]).length})</span></h2>${(()=>{const old=(s.equipment||[]).filter(e=>{const a=ageDays(e.updated);return a===null||a>180}).length;return old?`<span class="pill warn">${old} not updated in 6 months</span>`:""})()}</div>
+      <p class="muted" style="margin:0">After every software update — by the crew, the maker or remotely — press <b>Record update</b> and write the new version. The history is kept for inspectors.</p>
+      ${(s.equipment||[]).length?`<ol class="list eqlist">${s.equipment.map((e,i)=>eqRow(s,e,i)).join("")}</ol>`:`<p class="muted">No equipment yet.</p>`}
       <details class="fold" style="margin-top:14px" ${(s.equipment||[]).length?"":"open"}><summary><b>Add equipment</b></summary>
       <form class="form" id="eqForm" style="margin-top:12px">
         <label class="f">Name<input id="eq_name" required placeholder="e.g. ECDIS No.1"></label>
@@ -1199,6 +1308,7 @@ function collectInc(base){
     actions:v("in_act").value,cause:v("in_cause").value,lessons:v("in_less").value,authority:v("in_auth").value,status:v("in_status").value,updated:new Date().toISOString()};
 }
 function bind(v){
+  document.querySelectorAll("[data-viewphoto]").forEach(el=>el.addEventListener("click",e=>openPhoto(e.currentTarget.dataset.viewphoto)));
   if(v==="rutin")bindRoutine();
   const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
   on("[data-goship]","click",e=>{ui.ctlShip=e.currentTarget.dataset.goship;keepUI()});
@@ -1248,6 +1358,9 @@ function bind(v){
     on("[data-cver]","click",e=>{const c=e.currentTarget.dataset.cver;const r=(state.checks[s.id]?.answers||{})[c]||{};upd(c,{verified:!r.verified,returned:false});toast(r.verified?"Check removed":"Marked as checked")});
     on("[data-cret]","click",e=>{upd(e.currentTarget.dataset.cret,{verified:false,returned:true});toast("Sent back to the ship")});
     $("#ctCopy").addEventListener("click",()=>copyText(auditText(s.id)));
+    on("[data-cphoto]","change",async e=>{const c=e.target.dataset.cphoto;const f=e.target.files[0];if(!f)return;toast("Adding photo…");
+      try{const p=await makePhoto(f);const r=(state.checks[s.id]?.answers||{})[c]||{};upd(c,{photos:[...(r.photos||[]),p].slice(0,MAX_PHOTOS),verified:false})}catch(err){photoError(err)}});
+    CONTROLS.forEach(c=>on(`[data-cphdel-${c.id}]`,"click",e=>{const i=+e.currentTarget.getAttribute("data-cphdel-"+c.id);const r=(state.checks[s.id]?.answers||{})[c.id]||{};const ph=[...(r.photos||[])];const [gone]=ph.splice(i,1);dropAsset(gone);upd(c.id,{photos:ph})}));
   }
   if(v==="filo"){
     on("[data-selship]","click",e=>{ui.ship=e.currentTarget.dataset.selship;keepUI();render()});
@@ -1255,9 +1368,10 @@ function bind(v){
     const sf=$("#shipForm");if(sf){const s=state.ships.find(x=>x.id===ui.ship)||state.ships[0];
       sf.addEventListener("submit",e=>{e.preventDefault();put("ships",s.id,{...strip(s),name:$("#sh_name").value.trim()||"Unnamed ship",imo:$("#sh_imo").value.trim(),flag:$("#sh_flag").value.trim(),type:$("#sh_type").value.trim(),eu:$("#sh_eu").checked,e26:$("#sh_e26").checked});toast("Saved")});
       on("[data-delship]","click",e=>{const b=e.currentTarget;if(b.dataset.confirm){del("ships",s.id);del("checks",s.id);ui.ship=null;toast("Ship deleted")}else{b.dataset.confirm=1;b.textContent="Tap again to delete";b.classList.add("primary")}});
-      $("#eqForm").addEventListener("submit",e=>{e.preventDefault();const eq={name:$("#eq_name").value.trim(),type:$("#eq_type").value,vendor:$("#eq_vendor").value.trim(),sw:$("#eq_sw").value.trim(),net:$("#eq_net").value.trim(),updated:$("#eq_upd").value,remote:$("#eq_remote").checked};
+      $("#eqForm").addEventListener("submit",e=>{e.preventDefault();const eq={name:$("#eq_name").value.trim(),type:$("#eq_type").value,vendor:$("#eq_vendor").value.trim(),sw:$("#eq_sw").value.trim(),net:$("#eq_net").value.trim(),updated:$("#eq_upd").value,remote:$("#eq_remote").checked,updates:$("#eq_sw").value.trim()?[{date:$("#eq_upd").value||todayStr(),from:"",to:$("#eq_sw").value.trim(),who:"",note:"Added to equipment list",at:new Date().toISOString(),by:role}]:[]};
         put("ships",s.id,{...strip(s),equipment:[...(s.equipment||[]),eq]});toast("Added")});
-      on("[data-deleq]","click",e=>{const i=+e.currentTarget.dataset.deleq;const eqs=[...(s.equipment||[])];eqs.splice(i,1);put("ships",s.id,{...strip(s),equipment:eqs})});
+      on("[data-deleq]","click",e=>{const b=e.currentTarget;if(!b.dataset.confirm){b.dataset.confirm=1;b.textContent="Tap again to remove";b.classList.add("primary");return}const i=+b.dataset.deleq;const eqs=[...(s.equipment||[])];eqs.splice(i,1);ui.eqEdit=null;put("ships",s.id,{...strip(s),equipment:eqs})});
+      bindEquipment(s);
     }
   }
 }
