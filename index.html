@@ -317,7 +317,7 @@ details.it>*+*{margin-top:10px}
 .rmeta{display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center;margin-top:5px}
 .rdetail{display:flex;flex-direction:column;gap:10px;margin-top:10px;max-width:72ch}
 .rdetail p{margin:0}
-.rbtn{align-self:center;white-space:nowrap}
+.rbtn{align-self:start;white-space:nowrap}
 @media (max-width:860px){.ritem{grid-template-columns:14px minmax(0,1fr)}.rbtn{grid-column:2;justify-self:start}}
 
 .visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -338,6 +338,44 @@ input[type="file"]:focus-visible+*{outline:2px solid var(--accent)}
 .eq-sw b{font-size:.88rem;overflow-wrap:anywhere}
 .eqf{margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}
 @media (max-width:860px){.eq-head{grid-template-columns:1fr 1fr}.eq-head .li-main{grid-column:1/-1}}
+
+.howbox{background:var(--panel-2);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.howbox ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+.howlink{padding:3px 8px}
+.netwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);padding:8px}
+.netsvg{display:block;min-width:720px;width:100%;height:auto}
+.nz rect{fill:var(--panel);stroke:var(--line);stroke-width:1.2}
+.nz .zbar{stroke:none}
+.nz.k-ot .zbar{fill:var(--accent)}.nz.k-it .zbar{fill:var(--info)}.nz.k-crew .zbar{fill:var(--muted)}.nz.k-dmz .zbar{fill:var(--ok)}.nz.k-remote .zbar{fill:var(--warn)}.nz.k-edge .zbar{fill:var(--ink)}
+.nz.k-ext rect{fill:var(--soft);stroke:var(--faint);stroke-dasharray:5 4}
+.nz .zt{font:600 13px var(--f-body);fill:var(--ink)}
+.nz .ze{font:12px var(--f-body);fill:var(--muted)}
+.nl path{fill:none;stroke-width:2.4}
+.nl.s-ok path{stroke:var(--ok)}.nl.s-warn path,.nl.s-info path{stroke:var(--warn)}.nl.s-bad path{stroke:var(--bad);stroke-dasharray:7 5}.nl.s-unknown path{stroke:var(--faint);stroke-dasharray:3 4}
+.nl.p-off path{stroke:var(--faint);stroke-dasharray:2 6}
+.nb{cursor:pointer}
+.nb rect{stroke-width:1.2}
+.nb text{font:600 11px var(--f-mono)}
+.nb.s-ok rect{fill:var(--ok-bg);stroke:var(--ok)}.nb.s-ok text{fill:var(--ok)}
+.nb.s-warn rect,.nb.s-info rect{fill:var(--warn-bg);stroke:var(--warn)}.nb.s-warn text,.nb.s-info text{fill:var(--warn)}
+.nb.s-bad rect{fill:var(--bad-bg);stroke:var(--bad)}.nb.s-bad text{fill:var(--bad)}
+.nb.s-unknown rect{fill:var(--panel);stroke:var(--faint)}.nb.s-unknown text{fill:var(--muted)}
+.nb text.nh{font:600 10.5px var(--f-body)}
+.nb:focus{outline:none}.nb:focus-visible rect{stroke-width:3}
+.nlegend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.78rem;color:var(--muted)}
+.nlegend span{display:inline-flex;align-items:center;gap:6px}
+.lg{display:inline-block;width:12px;height:12px;border-radius:3px;flex:none}
+.lg.k-ot{background:var(--accent)}.lg.k-it{background:var(--info)}.lg.k-crew{background:var(--muted)}.lg.k-dmz{background:var(--ok)}.lg.k-remote{background:var(--warn)}.lg.k-edge{background:var(--ink)}.lg.k-ext{background:var(--faint)}
+.ll{display:inline-block;width:22px;height:0;border-top:3px solid}
+.ll.s-ok{border-color:var(--ok)}.ll.s-warn{border-color:var(--warn)}.ll.s-bad{border-color:var(--bad);border-top-style:dashed}.ll.s-unknown{border-color:var(--faint);border-top-style:dotted}
+.neted{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:14px}
+.neted .list>li{gap:10px}
+.flashrow{background:var(--accent-soft);border-radius:8px;padding-left:8px!important;padding-right:8px!important}
+.recs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.rec{display:grid;grid-template-columns:14px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.rec:last-child{border-bottom:0}
+.rec p{margin:6px 0 4px;max-width:74ch}
+.rec .rdot{background:var(--ok)}.rec-bad .rdot{background:var(--bad);box-shadow:0 0 0 4px var(--bad-bg)}.rec-warn .rdot{background:var(--warn)}.rec-info .rdot,.rec-unknown .rdot{background:var(--info)}
 </style>
 </head>
 <body>
@@ -745,6 +783,39 @@ const CONTROLS = [
 ];
 const STATUS = {"":["Not answered",""],ok:["Yes","ok"],part:["Partly","warn"],no:["No","bad"],na:["Not relevant",""]};
 
+/* ================== HOW TO DO EACH ROUTINE CHECK ================== */
+const HOWTO={
+  d_gps:{how:["Look at the GPS position on the ECDIS or on the GPS receiver.","Take a radar range and bearing of a fixed object (a point of land, a lighthouse, a buoy), or take a visual bearing.","Plot that position on the chart or ECDIS.","Compare the two positions. They should agree within normal accuracy — in coastal waters usually less than 0.1 NM.","In open sea with no land in range: compare the two GPS receivers, check that speed and course make sense, and that AIS targets sit on their radar echoes.","Write in the log book: \"GPS checked – OK\" with the time (UTC)."],
+    bad:"If the positions do not agree, do not trust the GPS.",guide:"gnss"},
+  d_usb:{how:["Walk past the computers on the bridge, in the engine control room and in the cargo control room.","Look at the USB ports at the front and the back of each computer.","Only allowed items should be plugged in: keyboard, mouse and approved licence dongles.","Check that the USB port locks are still in place."],
+    bad:"Take a photo first. Remove the unknown stick, put it in an envelope and write the time and place on it. Never plug it into another computer to see what is on it. Tell the SSO."},
+  d_alarm:{how:["ECDIS: open the alarm list. Look for unusual alarms — chart errors, sensor lost, licence errors.","Engine alarm system: look for alarms nobody can explain, values that jump, or alarms that switched off by themselves.","Loading computer: check that ship constants and tank values look normal.","Ask the previous watch if they saw anything strange."],
+    bad:"Write it down with the time. Tell the Master or the Chief Engineer. If a system acts by itself, follow the emergency guide.",guide:"config"},
+  d_backup:{how:["Open the backup program on the office computer (often an icon next to the clock, bottom right).","Look at the last backup: the date should be last night and the result \"completed\" or \"successful\".","If an external backup disk is used, check it was changed or unplugged as the procedure says."],
+    bad:"Start the backup again by hand. If it fails again, tell the SSO and company IT the same day."},
+  w_av:{how:["On each office computer, open the antivirus program (on Windows: Start → Windows Security).","Check that it says \"protection is up to date\" and that the last scan is less than a week old.","Open Windows Update and check there are no \"update failed\" messages.","Write down any computer that is not up to date."],
+    bad:"Connect the computer to the network so it can update. If it still fails, tell company IT and do not use it for e-mail until it is fixed."},
+  w_cab:{how:["Open the network cabinets (bridge, engine control room, office, server room).","Compare with the network diagram or the photo of the cabinet: same devices, about the same number of cables.","Look for unknown small boxes, extra Wi-Fi routers, or loose cables.","Look for one cable with both ends plugged into the same switch — this jams the whole network.","Lights blinking very fast on all ports at once is a warning sign.","Take a photo, then close and lock the cabinet."],
+    bad:"Take a photo. Do not unplug an unknown device unless it is clearly causing trouble — tell the ETO and SSO, and company IT decides."},
+  w_remote:{how:["Find the remote access box (VPN router) or the remote support program on the computers.","Check that it is switched OFF or disconnected when no service job is planned.","On the computers, check that no remote support window or icon is active.","Check the remote access log: each session written with date, company name and the Master's permission."],
+    bad:"Switch it off and ask who left it on. If someone connected without permission, follow the emergency guide.",guide:"mitm"},
+  w_mail:{how:["At the weekly safety meeting, or with a note on the notice board, remind the crew:","Do not open unexpected attachments or links — even from names you know.","Check the sender's address carefully, letter by letter.","Never give passwords by e-mail or phone, even if the message looks like it is from the company.","Report strange e-mails to the SSO. Do not delete them.","Write the reminder in the meeting minutes."]},
+  m_accounts:{how:["Make a list of the crew who signed off this month.","Send the list to company IT, or remove the accounts yourself if you are allowed to.","Change shared passwords they knew: Wi-Fi, ECDIS user, office computer.","Check that new crew have their own personal login."],
+    bad:"If the account of someone who left was used after they left, tell company IT immediately."},
+  m_restore:{how:["Open the backup program.","Choose one file from last week, for example a noon report.","Restore it to a different folder — never over the original file.","Open the restored file. It should open normally.","Write the date, the file name and the result."],
+    bad:"Tell company IT. If you cannot get files back now, you will not get them back after an attack."},
+  m_inventory:{how:["Open Ships & equipment in this app.","Walk through the bridge, engine control room, cargo control room and office.","Add any new or replaced computer or device; remove what is gone.","For every software update done this month, press Record update and write the new version.","Check that the network diagram is still correct."]},
+  m_logs:{how:["Ask the ETO or company IT to log in to the firewall.","Check that logs are being recorded and the latest entry is from today.","Check that the log storage is not full.","Write the result."],
+    bad:"Company IT must fix it. Without logs nobody can find out what happened after an incident."},
+  m_talk:{how:["Choose one topic: USB sticks, passwords, strange e-mails, GPS problems, or what to do with ransomware.","Open the emergency guide in this app and use its steps.","Talk for 5 minutes. Ask each crew member one question.","Write the topic and who attended in the minutes."]},
+  y_training:{how:["The company sends the training (online or on board).","Each crew member completes it and gets a certificate.","Bridge and engine users also do training for their own systems (ECDIS, alarm system).","Keep the certificates on board.","New crew complete it in their first month on board."]},
+  y_drill:{how:["Choose a situation from the emergency guide, for example ransomware on the office computer or GPS jamming.","Tell everyone it is a drill.","Follow the steps in the guide. At sea, do not really disconnect critical systems — act it out.","Time how long each step takes.","Afterwards talk about what went well and what to change.","Write the drill in the log book and drill records."]},
+  y_manual:{how:["Plan it with the Master — in safe waters or in port.","Change engine control from the bridge to the engine control room, then to local control.","Run the engine and steer by hand for a while.","Start and synchronise one generator by hand.","Write the times and any problems."],
+    bad:"Fix the procedure or train the crew before the next voyage."},
+  y_recover:{how:["Agree a date with the maker or company IT.","Choose one important system, for example the loading computer.","Reinstall it from its backup or clean copy — in port, or on spare equipment.","Check that it works and the settings are correct (for the loading computer: run the test conditions).","Write how long it took."]},
+  y_ssa:{how:["The company reviews the Ship Security Assessment for cyber risks.","It reviews this year's incidents from this app.","It updates the incident plan and this checklist.","It reviews the network diagram and its firewall and proxy recommendations.","It sends the updated documents to the ship."]}
+};
+
 /* ================== ROUTINE CHECKS (daily / weekly / monthly / yearly) ================== */
 const FREQ={daily:{label:"Daily",win:0},weekly:{label:"Weekly",win:2},monthly:{label:"Monthly",win:5},yearly:{label:"Yearly",win:30}};
 const ROUTINE=[
@@ -791,8 +862,8 @@ function vRoutine(){
     return `<section class="block"><h2>${FREQ[f].label}</h2><ol class="rlist">${ts.map(({t,s:st})=>{const op=ui.rtOpen[t.id];const hist=((state.routine[s.id]||{}).hist||{})[t.id]||[];
       return `<li class="ritem r-${st.st}"><span class="rdot" aria-hidden="true"></span>
         <div class="rmain"><button type="button" class="rtitle" data-rtopen="${t.id}" aria-expanded="${!!op}">${esc(t.t)}</button>
-          <div class="rmeta"><span class="pill ${st.st==="over"?"bad":st.st==="due"?"warn":"ok"}">${st.label}</span><span class="muted small">${esc(t.who)}</span>${st.last?`<span class="muted small">Last: ${st.last.at.slice(0,10)} · ${byLabel(st.last.by)}</span>`:""}<span class="muted small">Due: ${st.due}</span></div>
-          ${op?`<div class="rdetail"><p>${esc(t.h)}</p><label class="f">Note (optional)<input id="rn_${t.id}" placeholder="e.g. all OK / found unknown USB on ECR PC" value="${esc((ui.rtNote||{})[t.id]||"")}" data-rtnote="${t.id}"></label>
+          <div class="rmeta"><span class="pill ${st.st==="over"?"bad":st.st==="due"?"warn":"ok"}">${st.label}</span><span class="muted small">${esc(t.who)}</span>${st.last?`<span class="muted small">Last: ${st.last.at.slice(0,10)} · ${byLabel(st.last.by)}</span>`:""}<span class="muted small">Due: ${st.due}</span><button type="button" class="btn small ghost howlink" data-rtopen="${t.id}">${op?"Hide":"How to do it ›"}</button></div>
+          ${op?`<div class="rdetail"><p>${esc(t.h)}</p>${(()=>{const H=HOWTO[t.id];if(!H)return"";return `<div class="howbox"><div class="eyebrow">How to do it</div><ol>${H.how.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>${H.bad?`<div class="notice warn small"><b>If something is wrong:</b> ${esc(H.bad)}${H.guide&&SCEN[H.guide]?` <a href="#playbook" data-guide="${H.guide}">Open the emergency guide</a>`:""}</div>`:""}</div>`})()}<label class="f">Note (optional)<input id="rn_${t.id}" placeholder="e.g. all OK / found unknown USB on ECR PC" value="${esc((ui.rtNote||{})[t.id]||"")}" data-rtnote="${t.id}"></label>
             <div class="row">${photoInput("rp_"+t.id,"data-rtphoto",t.id)}<span class="muted small">The photo is saved with the next "Mark done".</span></div>${photoStrip(ui.rtPhoto[t.id],"data-rtphdel-"+t.id)}<div class="gref">Rule: ${esc(t.ref)}</div>
             ${hist.length?`<div><div class="eyebrow">History</div><ol class="done-list">${hist.slice(-8).reverse().map(h=>`<li><span class="mono muted">${h.at.slice(0,16).replace("T"," ")}</span> ${byLabel(h.by)}${h.note?" — "+esc(h.note):""}${photoStrip(h.photos)}</li>`).join("")}</ol></div>`:""}</div>`:""}
         </div>
@@ -807,7 +878,7 @@ function vRoutine(){
 function routineText(shipId){
   const s=state.ships.find(x=>x.id===shipId);const sum=routineSummary(shipId);
   let t=`ROUTINE CYBER CHECKS — ${s.name} (IMO ${s.imo||"-"})\nDate: ${todayStr()}\nOverdue ${sum.over} · Due now ${sum.due} · Up to date ${sum.ok}\n`;
-  Object.keys(FREQ).forEach(f=>{t+=`\n== ${FREQ[f].label.toUpperCase()} ==\n`;ROUTINE.filter(x=>x.f===f).forEach(x=>{const st=taskStatus(shipId,x);t+=`[${st.label}] ${x.t}\n   Who: ${x.who} · Last: ${st.last?st.last.at.slice(0,10):"never"} · Due: ${st.due} · Rule: ${x.ref}\n`})});
+  Object.keys(FREQ).forEach(f=>{t+=`\n== ${FREQ[f].label.toUpperCase()} ==\n`;ROUTINE.filter(x=>x.f===f).forEach(x=>{const st=taskStatus(shipId,x);t+=`[${st.label}] ${x.t}\n   Who: ${x.who} · Last: ${st.last?st.last.at.slice(0,10):"never"} · Due: ${st.due} · Rule: ${x.ref}\n`+(HOWTO[x.id]?HOWTO[x.id].how.map((s,i)=>`   ${i+1}. ${s}\n`).join(""):"")})});
   return t;
 }
 async function markRoutine(shipId,taskId){
@@ -825,6 +896,7 @@ function bindRoutine(){
   on("[data-rtf]","click",e=>{ui.rtFreq=e.currentTarget.dataset.rtf;render()});
   on("[data-rtopen]","click",e=>{const id=e.currentTarget.dataset.rtopen;ui.rtOpen[id]=!ui.rtOpen[id];render()});
   on("[data-rtdone]","click",e=>markRoutine(s.id,e.currentTarget.dataset.rtdone));
+  on("[data-guide]","click",e=>{ui.sc=e.currentTarget.dataset.guide;ui.eq=SCEN[ui.sc].eq;ui.open={};keepUI()});
   on("[data-rtnote]","input",e=>{ui.rtNote={...(ui.rtNote||{}),[e.target.dataset.rtnote]:e.target.value}});
   on("[data-rtphoto]","change",async e=>{const id=e.target.dataset.rtphoto;const f=e.target.files[0];if(!f)return;toast("Adding photo…");
     try{const p=await makePhoto(f);ui.rtPhoto[id]=[...(ui.rtPhoto[id]||[]),p].slice(0,MAX_PHOTOS);render()}catch(err){photoError(err)}});
@@ -912,19 +984,253 @@ function bindEquipment(s){
     ui.eqEdit=null;put("ships",s.id,{...strip(s),equipment:list});toast("Saved")});
 }
 
+/* ================== NETWORK DIAGRAM ================== */
+const ZT={
+  internet:{label:"Internet / satellite",tier:0,kind:"ext",desc:"Everything outside the ship"},
+  gateway:{label:"Satellite link & router",tier:1,kind:"edge",desc:"VSAT / FBB terminal and the router where all outside traffic enters"},
+  office:{label:"Office network",tier:2,kind:"it",desc:"Master's office, e-mail, paperwork"},
+  crew:{label:"Crew Wi-Fi",tier:2,kind:"crew",desc:"Crew phones and laptops"},
+  dmz:{label:"Update area (DMZ)",tier:2,kind:"dmz",desc:"A separate area where updates and files are checked before they reach ship systems"},
+  remote:{label:"Remote access",tier:2,kind:"remote",desc:"VPN box or remote support for makers and service companies"},
+  bridge:{label:"Bridge network",tier:3,kind:"ot",desc:"ECDIS, radar, GPS, AIS, GMDSS"},
+  engine:{label:"Engine network",tier:3,kind:"ot",desc:"Engine control, alarm system, power management"},
+  cargo:{label:"Cargo network",tier:3,kind:"ot",desc:"Loading computer, ballast, cargo control"},
+  security:{label:"Security network",tier:3,kind:"ot",desc:"CCTV, door access"}
+};
+const PROT={
+  unknown:{label:"Don't know",short:"?"},
+  none:{label:"Direct cable / same network — no protection",short:"NONE"},
+  switch:{label:"Separate network on the switch (VLAN) only",short:"VLAN"},
+  firewall:{label:"Firewall",short:"FW"},
+  fwproxy:{label:"Firewall + proxy server",short:"FW+PX"},
+  diode:{label:"One-way link (data diode)",short:"1-WAY"},
+  off:{label:"Normally unplugged",short:"OFF"}
+};
+const EQZONE={ecdis:"bridge",gnss:"bridge",gmdss:"bridge",propulsion:"engine",pms:"engine",ams:"engine",cargo:"cargo",vsat:"gateway",it:"office",crew:"crew",access:"security",remote:"remote"};
+const SEVORD={bad:0,warn:1,unknown:2,info:3,ok:4};
+function typicalNetwork(){
+  const z=t=>({id:t,type:t,name:ZT[t].label});
+  return {zones:["internet","gateway","office","crew","bridge","engine","cargo"].map(z),
+    links:[["internet","gateway"],["gateway","office"],["gateway","crew"],["office","bridge"],["office","engine"],["office","cargo"]].map(([a,b])=>({a,b,prot:"unknown"}))};
+}
+function minimalNetwork(){return {zones:[{id:"internet",type:"internet",name:ZT.internet.label},{id:"gateway",type:"gateway",name:ZT.gateway.label}],links:[{a:"internet",b:"gateway",prot:"unknown"}]}}
+function zoneOfEq(ship,e){
+  const zs=ship.network?.zones||[];
+  if(e.zone==="none")return null;
+  if(e.zone&&zs.some(z=>z.id===e.zone))return e.zone;
+  const want=EQZONE[e.type];const z=zs.find(z=>z.type===want);return z?z.id:null;
+}
+function analyzeNet(ship){
+  const net=ship.network;const out=[];const linkSev={};
+  if(!net)return {items:out,linkSev};
+  const Z={};net.zones.forEach(z=>Z[z.id]=z);
+  const nm=z=>z.name||ZT[z.type].label;
+  const add=(sev,title,fix,o={})=>{out.push({sev,title,fix,...o});if(o.link!==undefined&&SEVORD[sev]<SEVORD[linkSev[o.link]??"ok"])linkSev[o.link]=sev};
+  net.links.forEach((l,i)=>{
+    const A=Z[l.a],B=Z[l.b];if(!A||!B)return;
+    const where=`${nm(A)} ↔ ${nm(B)}`;const P=l.prot;
+    const isFW=P==="firewall"||P==="fwproxy";const weak=P==="none"||P==="switch";
+    const K=[ZT[A.type].kind,ZT[B.type].kind];const has=k=>K.includes(k);const oth=k=>ZT[A.type].kind===k?B:A;
+    const R={where,link:i};
+    if(P==="unknown"){add("unknown","Find out what protects this connection",`Ask the ETO or company IT what sits between these two networks (firewall, switch only, direct cable) and set it in the editor.`,{...R,ref:"UR E26 Identify — network drawing"});return}
+    if(P==="off"){add("ok","Normally unplugged",`Good. Plug it in only when needed, write it in the log, and unplug it again.`,{...R});return}
+    if(has("ext")){const o=oth("ext");
+      if(ZT[o.type].kind==="edge"){isFW?add("ok","Firewall where the internet enters the ship","Good. Keep its software updated and its password changed from the factory setting.",R)
+        :add("bad","Put a firewall where the satellite link enters the ship","All traffic from the internet comes in here. Without a firewall, anyone on the internet can try to reach the ship's computers.",{...R,dev:"firewall",ref:"MSC-FAL 3.5.3.3; EMSA Annex A (network protection)"})}
+      else add("bad",`${nm(o)} is connected straight to the internet`,`Connect it through the satellite router and its firewall instead — never directly.`,{...R,dev:"firewall",ref:"UR E26 Protect; MSC-FAL 3.5.3.4"});
+      return}
+    if(has("edge")){const o=oth("edge");const k=ZT[o.type].kind;
+      if(k==="ot"){
+        if(P==="diode")add("ok",`One-way link from ${nm(o)}`,"Good: data can go out to shore, nothing can come in.",R);
+        else if(!isFW)add("bad",`${nm(o)} is open to the internet without a firewall`,`Put a firewall here. Ship operation systems should never be reachable from the internet. Let chart and software updates come through a proxy server or an update area (DMZ).`,{...R,dev:"firewall",ref:"UR E26 Protect (security zones); MSC-FAL 2.2.2"});
+        else if(P==="firewall")add("warn",`Use a proxy server for ${nm(o)} updates`,`The firewall is good. Better still: ${nm(o)} should not talk to the internet itself. Let a proxy server or an update area (DMZ) download charts and updates, check them, and pass them on.`,{...R,dev:"proxy",ref:"UR E26 Protect; EMSA Annex A (update management)"});
+        else add("ok",`${nm(o)} reaches the internet only through firewall and proxy`,"Good. Allow only the addresses the maker needs for updates.",R);
+        return}
+      if(k==="it"){
+        if(!isFW)add("bad",`Firewall needed between the office network and the satellite link`,`Office computers receive e-mail and open web pages — the most common way attacks start. A firewall must sit here.`,{...R,dev:"firewall",ref:"MSC-FAL 3.5.3.3"});
+        else if(P==="firewall")add("info","Add a proxy server for office web traffic","A proxy server fetches web pages and downloads for the office computers, blocks dangerous sites and checks files for viruses before they reach the computer.",{...R,dev:"proxy",ref:"MSC-FAL 3.5.3.4; NIST PR.IR-01"});
+        else add("ok","Office web traffic goes through firewall and proxy","Good. Keep the proxy's block list updated.",R);
+        return}
+      if(k==="crew"){isFW?add("ok","Crew Wi-Fi has its own firewall rules","Good. Crew devices should reach only the internet — nothing else on board.",R)
+        :add("bad","Crew Wi-Fi needs a firewall","Crew phones and laptops are not controlled by the company. A firewall must make sure they can reach only the internet and none of the ship's networks.",{...R,dev:"firewall",ref:"EMSA Annex A (separate networks); MSC-FAL 2.2.2"});return}
+      if(k==="remote"){isFW?add("ok","Remote access comes through the firewall","Good. Use two-step login (code on phone), keep it switched off when no service job is planned, and log every session.",R)
+        :add("bad","Remote access must come through a firewall","Service companies log in here from the internet. Without a firewall, anyone who finds the address can try to log in.",{...R,dev:"firewall",ref:"MSC-FAL 3.5.3.4; NIS2 Art. 21(2)(j)"});return}
+      if(k==="dmz"){isFW?add("ok","Update area sits behind the firewall","Good.",R):add("bad","Put a firewall in front of the update area","The update area is where outside files arrive. It needs a firewall towards the internet.",{...R,dev:"firewall"});return}
+    }
+    if(has("crew")){const o=oth("crew");
+      add(isFW?"warn":"bad",`Crew Wi-Fi is connected to ${nm(o)}`,`Remove this connection. Crew devices should reach only the internet, through their own firewall rules.`,{...R,dev:isFW?null:"firewall",ref:"EMSA Annex A (crew network separated); MSC-FAL 2.2.2"});return}
+    if(has("it")&&has("ot")){const o=oth("it");
+      if(isFW||P==="diode")add("ok",`Firewall between the office and ${nm(o)}`,"Good. Allow only the traffic that is really needed.",R);
+      else add("bad",`Firewall needed between the office network and ${nm(o)}`,`A virus on an office computer could reach ${nm(o)}. Put a firewall here so only the necessary traffic can pass.`,{...R,dev:"firewall",ref:"UR E26 Protect (zone boundaries); EMSA Annex A"});
+      return}
+    if(has("remote")&&has("ot")){const o=oth("remote");
+      if(!isFW)add("bad",`Service companies can reach ${nm(o)} directly`,`Put a firewall here. Better: let them connect to the update area (DMZ) or a separate service computer, not straight into ${nm(o)}.`,{...R,dev:"firewall",ref:"UR E26 Protect; MSC-FAL 3.5.3.4"});
+      else add("warn",`Keep remote access to ${nm(o)} unplugged when not used`,`Switch it on only for a planned job with the Master's permission, and write it in the log.`,{...R,ref:"MSC-FAL 3.5.3.4"});
+      return}
+    if(has("dmz")&&has("ot")){const o=oth("dmz");
+      isFW||P==="diode"?add("ok",`Updates reach ${nm(o)} through a firewall`,"Good.",R):add("warn",`Put a firewall between the update area and ${nm(o)}`,"Only checked files should pass, through a firewall.",{...R,dev:"firewall"});return}
+    if(K[0]==="ot"&&K[1]==="ot"){
+      if(P==="none")add("warn",`Separate ${nm(A)} and ${nm(B)}`,"If one gets a virus, the other gets it too. Separate them at least with a VLAN on the switch — a firewall is better.",{...R,dev:"firewall",ref:"UR E26 Protect (security zones)"});
+      else if(P==="switch")add("info",`${nm(A)} and ${nm(B)} are separated on the switch`,"Acceptable. A firewall between them is better if they must exchange data.",{...R,dev:"firewall",ref:"UR E26 Protect"});
+      else add("ok",`${nm(A)} and ${nm(B)} are separated by a firewall`,"Good.",R);
+      return}
+    if(weak)add("warn",`Protect the connection ${where}`,"Put a firewall between these networks, or remove the connection if it is not needed.",{...R,dev:"firewall"});
+    else add("ok",`${where} is protected`,"Good.",R);
+  });
+  const types=net.zones.map(z=>z.type);
+  const otZones=net.zones.filter(z=>ZT[z.type].kind==="ot");
+  if(otZones.length&&!types.includes("dmz")&&net.links.some(l=>[l.a,l.b].some(id=>ZT[Z[id]?.type]?.kind==="ot")&&[l.a,l.b].some(id=>ZT[Z[id]?.type]?.kind==="edge")))
+    add("info","Add an update area (DMZ) with a proxy server","A small separate network next to the firewall where chart updates, software updates and USB files are downloaded and checked first. Ship systems then take updates only from there, never from the internet.",{where:"New network next to the satellite router",dev:"proxy",ref:"UR E26 Protect; EMSA Annex A (update management)"});
+  const linked=new Set();net.links.forEach(l=>{if(l.prot!=="off"){linked.add(l.a);linked.add(l.b)}});
+  otZones.forEach(z=>{if(!linked.has(z.id))add("ok",`${nm(z)} is not connected to other networks`,"This is the safest set-up. Take updates only from a checked USB stick, with permission.",{where:nm(z)})});
+  (ship.equipment||[]).forEach(e=>{
+    const zid=zoneOfEq(ship,e);const want=EQZONE[e.type];if(!zid||!want)return;const z=Z[zid];
+    if(ZT[want].kind==="ot"&&["it","crew"].includes(ZT[z.type].kind))
+      add("bad",`${e.name} is on the ${nm(z)}`,`Move it to the ${ZT[want].label}${types.includes(want)?"":" (add that network first)"} behind a firewall. Ship operation equipment should not share a network with office or crew computers.`,{where:e.name,dev:"firewall",ref:"EMSA Annex A (separate networks); UR E26 Protect"});
+  });
+  const unplaced=(ship.equipment||[]).filter(e=>!zoneOfEq(ship,e));
+  if(unplaced.length)add("info",`${unplaced.length} piece${unplaced.length>1?"s":""} of equipment not on the diagram`,`Choose a network for: ${unplaced.map(e=>e.name).join(", ")}. Use "Where is each piece of equipment?" in the editor.`,{where:"Equipment list"});
+  out.sort((x,y)=>SEVORD[x.sev]-SEVORD[y.sev]);
+  return {items:out,linkSev};
+}
+function netCounts(an){const c={bad:0,warn:0,info:0,unknown:0,ok:0};an.items.forEach(i=>c[i.sev]++);return c}
+const trunc=(s,n)=>s.length>n?s.slice(0,n-1)+"…":s;
+function netSVG(ship,an){
+  const net=ship.network;const W=960;const rows=[[],[],[],[]];
+  net.zones.forEach(z=>rows[ZT[z.type].tier].push(z));
+  const eqBy={};(ship.equipment||[]).forEach(e=>{const id=zoneOfEq(ship,e);if(id)(eqBy[id]=eqBy[id]||[]).push(e)});
+  const lines=z=>{const n=(eqBy[z.id]||[]).length;return z.type==="internet"?0:Math.min(n,4)+(n>4?1:0)||1};
+  const boxH=z=>z.type==="internet"?50:46+lines(z)*16;
+  const pos={};let y=20;
+  rows.forEach(r=>{if(!r.length)return;const gap=W/r.length;const h=Math.max(...r.map(boxH));
+    r.forEach((z,i)=>{const w=Math.min(200,gap-24);pos[z.id]={x:gap*(i+.5),y,w,h:boxH(z)}});y+=h+96});
+  const H=y-96+60;
+  const sevCls=s=>"s-"+(s||"ok");
+  const linksSvg=net.links.map((l,i)=>{const A=pos[l.a],B=pos[l.b];if(!A||!B)return"";
+    let d,mx,my;
+    if(Math.abs(A.y-B.y)<1){const x1=A.x,x2=B.x,y1=A.y+A.h,y2=B.y+B.h,cy=Math.max(y1,y2)+52;d=`M${x1} ${y1} Q${(x1+x2)/2} ${cy} ${x2} ${y2}`;mx=(x1+x2)/2;my=.25*y1+.5*cy+.25*y2}
+    else{const [U,L]=A.y<B.y?[A,B]:[B,A];const x1=U.x,y1=U.y+U.h,x2=L.x,y2=L.y;
+      const mid=Object.values(pos).filter(p=>p.y>U.y+1&&p.y<L.y-1);
+      const blocked=cx=>mid.some(p=>cx>p.x-p.w/2-14&&cx<p.x+p.w/2+14);
+      const straightHits=mid.some(p=>{const t=(p.y+p.h/2-y1)/(y2-y1);const xx=x1+(x2-x1)*t;return xx>p.x-p.w/2-10&&xx<p.x+p.w/2+10});
+      if(!mid.length||!straightHits){const dy=(y2-y1)/2;d=`M${x1} ${y1} C${x1} ${y1+dy} ${x2} ${y2-dy} ${x2} ${y2}`;mx=(x1+x2)/2;my=(y1+y2)/2}
+      else{const cands=[10,W-10];mid.forEach(p=>{cands.push(p.x-p.w/2-12,p.x+p.w/2+12)});
+        const target=(x1+x2)/2;const cx=cands.filter(c=>c>4&&c<W-4&&!blocked(c)).sort((a,b)=>Math.abs(a-target)-Math.abs(b-target))[0]??target;
+        const top=Math.min(...mid.map(p=>p.y))-14,bot=Math.max(...mid.map(p=>p.y+p.h))+14;
+        d=`M${x1} ${y1} C${x1} ${top} ${cx} ${y1} ${cx} ${top} L${cx} ${bot} C${cx} ${y2} ${x2} ${bot} ${x2} ${y2}`;mx=cx;my=(top+bot)/2}}
+    const sev=an.linkSev[i]||(l.prot==="unknown"?"unknown":"ok");const lab=PROT[l.prot].short;const bw=lab.length*7.4+16;
+    const rec=an.items.find(it=>it.link===i&&it.dev&&it.sev!=="ok");
+    const hint=rec?(rec.dev==="proxy"?"Proxy suggested":rec.sev==="bad"?"Firewall needed":"Firewall better"):"";
+    return `<g class="nl ${sevCls(sev)} p-${l.prot}"><path d="${d}"/></g>
+      <g class="nb ${sevCls(sev)}" data-netlink="${i}" tabindex="0" role="button" aria-label="${esc(PROT[l.prot].label)}"><rect x="${mx-bw/2}" y="${my-11}" width="${bw}" height="22" rx="11"/><text x="${mx}" y="${my+4}" text-anchor="middle">${lab}</text>
+      ${hint?`<text class="nh" x="${mx<90?mx-bw/2:mx>W-90?mx+bw/2:mx}" y="${my+25}" text-anchor="${mx<90?"start":mx>W-90?"end":"middle"}">${hint}</text>`:""}</g>`}).join("");
+  const zonesSvg=net.zones.map(z=>{const p=pos[z.id];const k=ZT[z.type].kind;const x=p.x-p.w/2;
+    if(z.type==="internet")return `<g class="nz k-ext"><rect x="${x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="25"/><text class="zt" x="${p.x}" y="${p.y+30}" text-anchor="middle">${esc(trunc(z.name||ZT[z.type].label,26))}</text></g>`;
+    const eqs=eqBy[z.id]||[];
+    const rowsT=eqs.slice(0,4).map((e,j)=>`<text class="ze" x="${x+14}" y="${p.y+52+j*16}">${esc(trunc(e.name,27))}</text>`).join("")+(eqs.length>4?`<text class="ze muted" x="${x+14}" y="${p.y+52+64}">+${eqs.length-4} more</text>`:"")+(!eqs.length?`<text class="ze muted" x="${x+14}" y="${p.y+52}">no equipment placed</text>`:"");
+    return `<g class="nz k-${k}"><rect x="${x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="10"/><rect class="zbar" x="${x}" y="${p.y}" width="${p.w}" height="5" rx="2"/>
+      <text class="zt" x="${x+14}" y="${p.y+27}">${esc(trunc(z.name||ZT[z.type].label,24))}</text>${rowsT}</g>`}).join("");
+  return `<svg class="netsvg" viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="Network diagram of ${esc(ship.name)}">${linksSvg}${zonesSvg}</svg>`;
+}
+function netLegend(){return `<div class="nlegend"><span><i class="lg k-ot"></i>Ship operation (bridge, engine, cargo)</span><span><i class="lg k-it"></i>Office &amp; IT</span><span><i class="lg k-crew"></i>Crew</span><span><i class="lg k-dmz"></i>Update area</span><span><i class="lg k-remote"></i>Remote access</span>
+  <span><i class="ll s-ok"></i>Protected</span><span><i class="ll s-warn"></i>Could be better</span><span><i class="ll s-bad"></i>Needs a firewall</span><span><i class="ll s-unknown"></i>Not known yet</span></div>`}
+const SEVLBL={bad:["Must fix","bad"],warn:["Should improve","warn"],unknown:["Find out","info"],info:["Suggestion","info"],ok:["Good","ok"]};
+function netRecHTML(an){
+  if(!an.items.length)return "";
+  const todo=an.items.filter(i=>i.sev!=="ok"),good=an.items.filter(i=>i.sev==="ok");
+  const li=i=>`<li class="rec rec-${i.sev}"><span class="rdot" aria-hidden="true"></span><div><div class="row" style="gap:8px"><b>${esc(i.title)}</b><span class="pill ${SEVLBL[i.sev][1]}">${SEVLBL[i.sev][0]}</span>${i.dev==="firewall"?'<span class="pill ot">Firewall</span>':i.dev==="proxy"?'<span class="pill info">Proxy server</span>':""}</div>
+    ${i.where?`<div class="muted small">Where: ${esc(i.where)}</div>`:""}<p>${esc(i.fix)}</p>${i.ref?`<div class="gref">Rule: ${esc(i.ref)}</div>`:""}</div></li>`;
+  return `${todo.length?`<ol class="recs">${todo.map(li).join("")}</ol>`:`<div class="notice" style="background:var(--ok-bg);border-color:transparent"><b>No problems found.</b> Keep the diagram up to date when equipment changes.</div>`}
+    ${good.length?`<details class="fold"><summary><b>What is already good (${good.length})</b></summary><ol class="recs" style="margin-top:8px">${good.map(li).join("")}</ol></details>`:""}`;
+}
+function netText(ship){
+  const an=analyzeNet(ship);const c=netCounts(an);
+  let t=`NETWORK REVIEW — ${ship.name} (IMO ${ship.imo||"-"})\nDate: ${todayStr()}\nMust fix ${c.bad} · Should improve ${c.warn} · Find out ${c.unknown} · Suggestions ${c.info} · Good ${c.ok}\n\nNETWORKS\n`;
+  ship.network.zones.forEach(z=>{const eqs=(ship.equipment||[]).filter(e=>zoneOfEq(ship,e)===z.id).map(e=>e.name);t+=`- ${z.name||ZT[z.type].label}${eqs.length?": "+eqs.join(", "):""}\n`});
+  t+=`\nCONNECTIONS\n`;const Z={};ship.network.zones.forEach(z=>Z[z.id]=z);
+  ship.network.links.forEach(l=>{if(Z[l.a]&&Z[l.b])t+=`- ${Z[l.a].name} ↔ ${Z[l.b].name}: ${PROT[l.prot].label}\n`});
+  t+=`\nRECOMMENDATIONS\n`;an.items.forEach(i=>{t+=`[${SEVLBL[i.sev][0]}] ${i.title}${i.dev?` (${i.dev==="firewall"?"firewall":"proxy server"})`:""}\n   ${i.where?"Where: "+i.where+"\n   ":""}${i.fix}${i.ref?"\n   Rule: "+i.ref:""}\n`});
+  return t;
+}
+function netBlock(s){
+  if(!s.network)return `<section class="block" id="netblock"><h2>Network diagram</h2>
+    <p class="muted" style="margin:0">A simple drawing of the ship's networks: which networks exist, what equipment is on each, and how they are connected. The app then tells you where a firewall or a proxy server should be.</p>
+    <div class="row"><button class="btn primary" data-netstart="typical">Start with a typical ship network</button><button class="btn" data-netstart="min">Start almost empty</button></div>
+    <p class="muted small" style="margin:0">Not sure? Choose the typical network, then correct it with the ETO or company IT.</p></section>`;
+  const an=analyzeNet(s);const c=netCounts(an);const ed=ui.netEdit;
+  const Z=s.network.zones;
+  const zsel=(id,val,attr,extra="")=>`<select id="${id}" ${attr}>${extra}${Z.map(z=>`<option value="${z.id}" ${z.id===val?"selected":""}>${esc(z.name||ZT[z.type].label)}</option>`).join("")}</select>`;
+  const editor=ed?`<div class="neted">
+    <div class="eyebrow">1 · Networks on board</div>
+    <ol class="list">${Z.map((z,i)=>`<li><span class="lg k-${ZT[z.type].kind}"></span><label class="f" style="flex:1 1 220px">Name<input id="nz_${z.id}" data-zname="${z.id}" value="${esc(z.name||"")}"></label><span class="muted small" style="flex:1 1 200px">${esc(ZT[z.type].desc)}</span>${z.type==="internet"?"":`<button class="btn small ghost" type="button" data-zdel="${z.id}">Remove</button>`}</li>`).join("")}</ol>
+    <div class="row"><select id="nz_add" aria-label="Network to add">${Object.entries(ZT).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("")}</select><button class="btn small" type="button" id="nzAdd">+ Add network</button></div>
+    <div class="eyebrow" style="margin-top:6px">2 · Connections — what sits between two networks?</div>
+    <ol class="list">${s.network.links.map((l,i)=>{const A=Z.find(z=>z.id===l.a),B=Z.find(z=>z.id===l.b);if(!A||!B)return"";
+      return `<li id="nlrow_${i}" class="${ui.netFocus===i?"flashrow":""}"><b style="flex:1 1 240px">${esc(A.name)} ↔ ${esc(B.name)}</b><select id="nl_p_${i}" data-lprot="${i}" style="flex:1 1 260px;width:auto">${Object.entries(PROT).map(([k,v])=>`<option value="${k}" ${k===l.prot?"selected":""}>${v.label}</option>`).join("")}</select><button class="btn small ghost" type="button" data-ldel="${i}">Remove</button></li>`}).join("")}</ol>
+    <div class="form">${`<label class="f">From${zsel("nl_a","","")}</label><label class="f">To${zsel("nl_b",Z[1]?.id,"")}</label>`}<label class="f">Protection<select id="nl_p">${Object.entries(PROT).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("")}</select></label><div style="align-self:end"><button class="btn small" type="button" id="nlAdd">+ Add connection</button></div></div>
+    <div class="eyebrow" style="margin-top:6px">3 · Where is each piece of equipment?</div>
+    ${(s.equipment||[]).length?`<ol class="list">${s.equipment.map((e,i)=>`<li><b style="flex:1 1 240px">${esc(e.name)}</b><span class="muted small" style="flex:1 1 160px">${esc(EQUIP[e.type]?.label||"")}</span><select id="ne_${i}" data-eqzone="${i}" style="flex:1 1 220px;width:auto">${Z.map(z=>`<option value="${z.id}" ${zoneOfEq(s,e)===z.id?"selected":""}>${esc(z.name)}</option>`).join("")}<option value="none" ${!zoneOfEq(s,e)?"selected":""}>Not on the diagram</option></select></li>`).join("")}</ol>`:`<p class="muted small" style="margin:0">Add equipment in the list above first.</p>`}
+    <div class="eyebrow" style="margin-top:6px">4 · Photo of the real network drawing or cabinet (optional)</div>
+    <div class="row">${photoInput("np_file","data-netphoto","1")}</div>
+    <div class="row"><button class="btn primary" type="button" data-netedit="0">Done editing</button><button class="btn ghost" type="button" data-netreset style="margin-left:auto">Delete diagram</button></div>
+  </div>`:"";
+  return `<section class="block" id="netblock"><div class="steps-h"><h2>Network diagram</h2><span class="row">${c.bad?`<span class="pill bad">${c.bad} must fix</span>`:""}${c.warn?`<span class="pill warn">${c.warn} should improve</span>`:""}${c.unknown?`<span class="pill info">${c.unknown} to find out</span>`:""}${!ed?`<button class="btn small primary" data-netedit="1">Edit diagram</button>`:""}<button class="btn small ghost" id="netCopy">Copy review</button></span></div>
+    <div class="netwrap">${netSVG(s,an)}</div>${netLegend()}
+    <p class="muted small" style="margin:0">Tap a label on a line to change what protects that connection.</p>
+    ${photoStrip(s.netPhotos,"data-netphdel")}
+    ${editor}
+    </section>
+    <section class="block"><h2>Where to use firewalls and proxy servers</h2>
+      <div class="explain"><b>Firewall</b> — like a guard at the door between two networks. Only traffic that is allowed can pass. Put one wherever an outside network, an office network or crew Wi-Fi meets the networks that run the ship.<br><br><b>Proxy server</b> — a middleman that fetches web pages, chart updates and software updates for the ship's computers. It checks the files and hides the ship systems from the internet, so they never connect to it themselves.</div>
+      ${netRecHTML(an)}</section>`;
+}
+function bindNet(s){
+  const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
+  const save=net=>put("ships",s.id,{...strip(s),network:net});
+  const N=()=>JSON.parse(JSON.stringify(s.network||null));
+  on("[data-netstart]","click",e=>{ui.netEdit=true;save(e.currentTarget.dataset.netstart==="typical"?typicalNetwork():minimalNetwork())});
+  on("[data-netedit]","click",e=>{ui.netEdit=e.currentTarget.dataset.netedit==="1";ui.netFocus=null;render();if(ui.netEdit){const n=document.querySelector(".neted");n&&n.scrollIntoView({block:"start"})}});
+  const goLink=i=>{ui.netEdit=true;ui.netFocus=i;render();const r=document.getElementById("nl_p_"+i);if(r){r.scrollIntoView({block:"center"});r.focus()}};
+  on("[data-netlink]","click",e=>goLink(+e.currentTarget.dataset.netlink));
+  on("[data-netlink]","keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();goLink(+e.currentTarget.dataset.netlink)}});
+  const cp=$("#netCopy");cp&&cp.addEventListener("click",()=>copyText(netText(s)));
+  if(!s.network)return;
+  on("[data-zname]","change",e=>{const n=N();const z=n.zones.find(z=>z.id===e.target.dataset.zname);z.name=e.target.value.trim()||ZT[z.type].label;save(n)});
+  on("[data-zdel]","click",e=>{const b=e.currentTarget;if(!b.dataset.confirm){b.dataset.confirm=1;b.textContent="Tap again to remove";b.classList.add("primary");return}
+    const id=b.dataset.zdel;const n=N();n.zones=n.zones.filter(z=>z.id!==id);n.links=n.links.filter(l=>l.a!==id&&l.b!==id);save(n)});
+  const za=$("#nzAdd");za&&za.addEventListener("click",()=>{const t=$("#nz_add").value;const n=N();let id=t,k=2;while(n.zones.some(z=>z.id===id))id=t+"_"+k++;
+    n.zones.push({id,type:t,name:ZT[t].label+(k>2?" "+(k-1):"")});
+    const gw=n.zones.find(z=>z.type==="gateway");if(gw&&t!=="internet"&&t!=="gateway"&&ZT[t].kind!=="ot")n.links.push({a:gw.id,b:id,prot:"unknown"});
+    save(n);toast("Network added")});
+  on("[data-lprot]","change",e=>{const n=N();n.links[+e.target.dataset.lprot].prot=e.target.value;ui.netFocus=null;save(n)});
+  on("[data-ldel]","click",e=>{const n=N();n.links.splice(+e.currentTarget.dataset.ldel,1);ui.netFocus=null;save(n)});
+  const la=$("#nlAdd");la&&la.addEventListener("click",()=>{const a=$("#nl_a").value,b=$("#nl_b").value,p=$("#nl_p").value;
+    if(a===b){toast("Choose two different networks.");return}const n=N();
+    if(n.links.some(l=>(l.a===a&&l.b===b)||(l.a===b&&l.b===a))){toast("These two are already connected. Change the protection in the list.");return}
+    n.links.push({a,b,prot:p});save(n);toast("Connection added")});
+  on("[data-eqzone]","change",e=>{const i=+e.target.dataset.eqzone;const eqs=[...(s.equipment||[])];eqs[i]={...eqs[i],zone:e.target.value};put("ships",s.id,{...strip(s),equipment:eqs})});
+  on("[data-netphoto]","change",async e=>{const f=e.target.files[0];if(!f)return;toast("Adding photo…");try{const p=await makePhoto(f);put("ships",s.id,{...strip(s),netPhotos:[...(s.netPhotos||[]),p].slice(0,MAX_PHOTOS)})}catch(err){photoError(err)}});
+  on("[data-netphdel]","click",e=>{const ph=[...(s.netPhotos||[])];const [g]=ph.splice(+e.currentTarget.dataset.netphdel,1);dropAsset(g);put("ships",s.id,{...strip(s),netPhotos:ph})});
+  on("[data-netreset]","click",e=>{const b=e.currentTarget;if(!b.dataset.confirm){b.dataset.confirm=1;b.textContent="Tap again to delete the diagram";b.classList.add("primary");return}
+    ui.netEdit=false;const c={...strip(s)};delete c.network;put("ships",s.id,c)});
+}
+
 /* ================== DATA LAYER ================== */
 const state = {ships:[],checks:{},incidents:[],routine:{},mode:"loading"};
 let db=null, downloads=null;
 const LKEY="pruva-siber-local";
 const EXAMPLE={
   ships:[{id:"ship-example1",name:"EXAMPLE – MV Marmara Star",imo:"9876543",flag:"Malta",type:"Bulk carrier",eu:true,e26:true,example:true,created:"2026-11-04T07:00:00.000Z",
+    network:{zones:[{id:"internet",type:"internet",name:"Internet / satellite"},{id:"gateway",type:"gateway",name:"Satellite link & router"},{id:"office",type:"office",name:"Office network"},{id:"crew",type:"crew",name:"Crew Wi-Fi"},{id:"bridge",type:"bridge",name:"Bridge network"},{id:"engine",type:"engine",name:"Engine network"},{id:"cargo",type:"cargo",name:"Cargo network"}],
+      links:[{a:"internet",b:"gateway",prot:"firewall"},{a:"gateway",b:"office",prot:"firewall"},{a:"gateway",b:"crew",prot:"switch"},{a:"gateway",b:"bridge",prot:"firewall"},{a:"office",b:"engine",prot:"firewall"},{a:"office",b:"cargo",prot:"none"},{a:"bridge",b:"engine",prot:"switch"}]},
+    
     equipment:[
       {name:"ECDIS No.1",type:"ecdis",vendor:"Example maker",sw:"v5.3",net:"Bridge network",updated:"2026-09-12",remote:true},
       {name:"GPS receiver No.1",type:"gnss",vendor:"Example maker",sw:"fw 3.0",net:"Bridge network",updated:"2026-04-02",remote:false},
       {name:"GMDSS console",type:"gmdss",vendor:"Example maker",sw:"",net:"Bridge network",updated:"2025-12-10",remote:false},
       {name:"Main engine remote control",type:"propulsion",vendor:"Example maker",sw:"fw 2.1",net:"Engine network",updated:"2026-03-02",remote:false},
       {name:"Engine alarm & monitoring",type:"ams",vendor:"Example maker",sw:"v8",net:"Engine network",updated:"2026-03-02",remote:true},
-      {name:"Loading computer",type:"cargo",vendor:"Example maker",sw:"v12",net:"Office network",updated:"2026-05-20",remote:false},
+      {name:"Loading computer",type:"cargo",vendor:"Example maker",sw:"v12",net:"Office network",updated:"2026-05-20",remote:false,zone:"office"},
       {name:"VSAT terminal and firewall",type:"vsat",vendor:"Example maker",sw:"fw 8.4",net:"Gateway",updated:"2026-10-01",remote:true},
       {name:"Master's office computer",type:"it",vendor:"",sw:"Windows 11",net:"Office network",updated:"2026-10-15",remote:true},
       {name:"Crew Wi-Fi",type:"crew",vendor:"",sw:"",net:"Crew network",updated:"2026-06-01",remote:true}]}],
@@ -944,7 +1250,13 @@ function exampleRoutine(id){
   const hist={};Object.entries(last).forEach(([k,v])=>hist[k]=[v]);
   return {[id]:{ship:id,last,hist}};
 }
-function loadLocal(){try{const raw=localStorage.getItem(LKEY);const d=JSON.parse(raw||"null");if(d){state.ships=d.ships||[];state.checks=d.checks||{};state.incidents=d.incidents||[];state.routine=d.routine||{};return}
+function loadLocal(){try{const raw=localStorage.getItem(LKEY);const d=JSON.parse(raw||"null");if(d){state.ships=d.ships||[];state.checks=d.checks||{};state.incidents=d.incidents||[];state.routine=d.routine||{};
+    let changed=false;const ex=EXAMPLE.ships[0];
+    state.ships.forEach(s=>{if(!s.example)return;
+      if(!s.network){s.network=JSON.parse(JSON.stringify(ex.network));changed=true}
+      (s.equipment||[]).forEach(e=>{if(e.type==="cargo"&&!e.zone&&/office|business/i.test(e.net||"")){e.zone="office";changed=true}});
+      if(!state.routine[s.id]){Object.assign(state.routine,exampleRoutine(s.id));changed=true}});
+    if(changed)saveLocal();return}
   if(raw===null&&!window.claude){const ex=JSON.parse(JSON.stringify(EXAMPLE));state.ships=ex.ships;state.checks=ex.checks;state.incidents=ex.incidents;state.routine=exampleRoutine("ship-example1");saveLocal()}}catch(e){}}
 function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify({ships:state.ships,checks:state.checks,incidents:state.incidents,routine:state.routine}));return true}catch(e){toast("This browser's storage is full. Remove some photos.");return false}}
 function uid(p){return p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
@@ -1018,7 +1330,7 @@ const saveFile=(name,text)=>saveBlob(name,text);
 /* ================== VIEW STATE ================== */
 const views={panel:vHome,rutin:vRoutine,playbook:vGuide,olay:vIncidents,kontrol:vChecks,filo:vShips,mevzuat:vRules};
 const CRUMB={panel:"Home",rutin:"Routine checks",playbook:"Emergency guide",olay:"Incident reports",kontrol:"Ship checklist",filo:"Ships & equipment",mevzuat:"Rules & references"};
-let ui={ship:null,eq:"it",sc:"ransomware",marsec:1,inc:null,ctlShip:null,ctlFilter:"all",done:{},params:{},plat:{},linkInc:"",open:{},openIT:{},rtShip:null,rtFreq:"todo",rtOpen:{},eqEdit:null,eqOpen:{},rtPhoto:{}};
+let ui={ship:null,eq:"it",sc:"ransomware",marsec:1,inc:null,ctlShip:null,ctlFilter:"all",done:{},params:{},plat:{},linkInc:"",open:{},openIT:{},rtShip:null,rtFreq:"todo",rtOpen:{},eqEdit:null,eqOpen:{},rtPhoto:{},netEdit:false,netFocus:null};
 try{Object.assign(ui,JSON.parse(sessionStorage.getItem("pruva-ui")||"{}"))}catch(e){}
 if(!SCEN[ui.sc])ui.sc="ransomware"; if(!EQUIP[ui.eq])ui.eq=SCEN[ui.sc].eq;
 function keepUI(){try{sessionStorage.setItem("pruva-ui",JSON.stringify({ship:ui.ship,eq:ui.eq,sc:ui.sc,marsec:ui.marsec,ctlShip:ui.ctlShip,params:ui.params,plat:ui.plat,linkInc:ui.linkInc,done:ui.done,rtShip:ui.rtShip}))}catch(e){}}
@@ -1055,7 +1367,7 @@ function vHome(){
     <section class="block"><h2>Your ships</h2>
     ${state.ships.length?`<ol class="list">${state.ships.map(s=>{const sc=score(s.id);const rc=sc.pct>=80?"ok":sc.pct>=50?"warn":"bad";
       return `<li><div class="li-main"><b>${esc(s.name)}</b><span class="muted">IMO ${esc(s.imo||"—")} · ${esc(s.flag||"—")}${s.example?" · example record":""}</span></div>
-      <span class="pill ${sc.n?rc:''}">Checklist ${sc.n?sc.pct+"%":"not started"}</span>${sc.open?`<span class="muted small">${sc.open} questions to answer</span>`:""}
+      <span class="pill ${sc.n?rc:''}">Checklist ${sc.n?sc.pct+"%":"not started"}</span>${s.network?(()=>{const c=netCounts(analyzeNet(s));return c.bad?`<a class="pill bad" href="#filo" data-selship2="${s.id}">Network: ${c.bad} must fix</a>`:""})():`<a class="pill" href="#filo" data-selship2="${s.id}">No network diagram</a>`}${sc.open?`<span class="muted small">${sc.open} questions to answer</span>`:""}
       <a class="btn small" href="#kontrol" data-goship="${s.id}">Checklist</a></li>`}).join("")}</ol>`:noShips()}</section>
     <section class="block"><h2>How this app works</h2><ol class="howto">
       <li><b>Emergency guide</b> — when something goes wrong, choose what you see. The app gives you numbered steps. Do them in order and tick each one.</li>
@@ -1271,7 +1583,8 @@ function vShips(){
         <label class="f">Network <span class="muted">(if known)</span><input id="eq_net" placeholder="e.g. Bridge network"></label>
         <label class="f">Last updated<input id="eq_upd" type="date"></label>
         <label class="chk wide"><input type="checkbox" id="eq_remote"> Connects to the internet, or a service company can log in remotely</label>
-        <div class="wide"><button class="btn primary" type="submit">Add</button></div></form></details></section>`:noShips()}`;
+        <div class="wide"><button class="btn primary" type="submit">Add</button></div></form></details></section>
+    ${netBlock(s)}`:noShips()}`;
 }
 
 /* ================== RULES ================== */
@@ -1313,6 +1626,7 @@ function bind(v){
   const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
   on("[data-goship]","click",e=>{ui.ctlShip=e.currentTarget.dataset.goship;keepUI()});
   on("[data-rtship]","click",e=>{ui.rtShip=e.currentTarget.dataset.rtship;keepUI()});
+  on("[data-selship2]","click",e=>{ui.ship=e.currentTarget.dataset.selship2;keepUI()});
   on("[data-openinc]","click",e=>{e.preventDefault();ui.inc=e.currentTarget.dataset.openinc;if(location.hash!=="#olay")location.hash="olay";else render()});
   if(v==="playbook"&&state.ships.length){
     const s=curShip();
@@ -1363,7 +1677,7 @@ function bind(v){
     CONTROLS.forEach(c=>on(`[data-cphdel-${c.id}]`,"click",e=>{const i=+e.currentTarget.getAttribute("data-cphdel-"+c.id);const r=(state.checks[s.id]?.answers||{})[c.id]||{};const ph=[...(r.photos||[])];const [gone]=ph.splice(i,1);dropAsset(gone);upd(c.id,{photos:ph})}));
   }
   if(v==="filo"){
-    on("[data-selship]","click",e=>{ui.ship=e.currentTarget.dataset.selship;keepUI();render()});
+    on("[data-selship]","click",e=>{ui.ship=e.currentTarget.dataset.selship;ui.netEdit=false;ui.eqEdit=null;keepUI();render()});
     on("[data-newship]","click",()=>{const id=uid("ship");ui.ship=id;keepUI();put("ships",id,{name:"New ship",imo:"",flag:"",type:"",eu:false,e26:false,equipment:[],created:new Date().toISOString()})});
     const sf=$("#shipForm");if(sf){const s=state.ships.find(x=>x.id===ui.ship)||state.ships[0];
       sf.addEventListener("submit",e=>{e.preventDefault();put("ships",s.id,{...strip(s),name:$("#sh_name").value.trim()||"Unnamed ship",imo:$("#sh_imo").value.trim(),flag:$("#sh_flag").value.trim(),type:$("#sh_type").value.trim(),eu:$("#sh_eu").checked,e26:$("#sh_e26").checked});toast("Saved")});
@@ -1372,6 +1686,7 @@ function bind(v){
         put("ships",s.id,{...strip(s),equipment:[...(s.equipment||[]),eq]});toast("Added")});
       on("[data-deleq]","click",e=>{const b=e.currentTarget;if(!b.dataset.confirm){b.dataset.confirm=1;b.textContent="Tap again to remove";b.classList.add("primary");return}const i=+b.dataset.deleq;const eqs=[...(s.equipment||[])];eqs.splice(i,1);ui.eqEdit=null;put("ships",s.id,{...strip(s),equipment:eqs})});
       bindEquipment(s);
+      bindNet(s);
     }
   }
 }
