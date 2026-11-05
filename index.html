@@ -376,6 +376,27 @@ input[type="file"]:focus-visible+*{outline:2px solid var(--accent)}
 .rec:last-child{border-bottom:0}
 .rec p{margin:6px 0 4px;max-width:74ch}
 .rec .rdot{background:var(--ok)}.rec-bad .rdot{background:var(--bad);box-shadow:0 0 0 4px var(--bad-bg)}.rec-warn .rdot{background:var(--warn)}.rec-info .rdot,.rec-unknown .rdot{background:var(--info)}
+
+.netalert{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:var(--r);background:var(--bad);color:#fff;text-decoration:none;box-shadow:0 6px 20px rgba(180,39,31,.25)}
+.netalert b{display:block;font:600 1.15rem/1.25 var(--f-display)}
+.netalert span span{display:block;opacity:.92;font-size:.88rem}
+.alerts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.alert{display:grid;grid-template-columns:14px minmax(0,1fr);gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.alert:last-child{border-bottom:0;padding-bottom:0}
+.alert .rdot{margin-top:6px}.al-bad .rdot{background:var(--bad);box-shadow:0 0 0 4px var(--bad-bg)}.al-warn .rdot{background:var(--warn)}.al-info .rdot{background:var(--info)}
+.al-main{display:flex;flex-direction:column;gap:6px}
+.al-main p{margin:0;max-width:78ch}
+.al-todo{background:var(--panel-2);border-radius:8px;padding:8px 12px;font-size:.9rem;max-width:78ch}
+.drop{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;text-align:center;padding:26px 16px;border:2px dashed var(--line);border-radius:12px;cursor:pointer;background:var(--panel-2)}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.spark{display:block;width:100%;height:auto;min-width:520px}
+.sp-grid{stroke:var(--line);stroke-width:1}.sp-base{stroke:var(--ok);stroke-dasharray:5 4;stroke-width:1.4}
+.sp-area{fill:var(--accent-soft);stroke:none}.sp-line{fill:none;stroke:var(--accent);stroke-width:2}.sp-pk{fill:var(--accent);stroke:var(--panel);stroke-width:2}
+.sp-ax{font:11px var(--f-mono);fill:var(--muted)}
+.bar{flex:1 1 120px;height:8px;border-radius:99px;background:var(--soft);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--info);border-radius:99px}
+code{font:.85em var(--f-mono);background:var(--soft);padding:2px 6px;border-radius:5px;overflow-wrap:anywhere}
+@media (max-width:860px){.netalert{flex-wrap:wrap}}
 </style>
 </head>
 <body>
@@ -389,6 +410,7 @@ input[type="file"]:focus-visible+*{outline:2px solid var(--accent)}
     <nav id="nav">
       <a href="#panel"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Home</a>
       <a href="#rutin"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15l2 2 4-4"/></svg>Routine checks<span class="badge" id="rtBadge" hidden></span></a>
+      <a href="#izle"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>Network monitor<span class="badge" id="mnBadge" hidden></span></a>
       <a href="#playbook" class="nav-sos"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M12 8v5"/><path d="M12 16v.3"/></svg>Emergency guide</a>
       <a href="#olay"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Incident reports<span class="badge" id="incBadge" hidden></span></a>
       <a href="#kontrol"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>Ship checklist</a>
@@ -959,9 +981,10 @@ function eqRow(s,e,i){
       <label class="f">Software version<input id="ee_sw_${i}" class="mono" value="${esc(e.sw||"")}"></label>
       <label class="f">Last updated<input id="ee_upd_${i}" type="date" value="${esc(e.updated||"")}"></label>
       <label class="f">Network<input id="ee_net_${i}" value="${esc(e.net||"")}"></label>
+      <label class="f">IP address<input id="ee_ip_${i}" class="mono" value="${esc(e.ip||"")}" placeholder="e.g. 10.0.20.5"></label>
       <label class="chk wide"><input type="checkbox" id="ee_remote_${i}" ${e.remote?"checked":""}> Connects to the internet, or a service company can log in remotely</label>
       <div class="row wide"><button class="btn primary" type="submit">Save</button><button class="btn ghost" type="button" data-eqcancel>Cancel</button><button class="btn ghost" type="button" data-deleq="${i}" style="margin-left:auto">Remove equipment</button></div></form>`;
-  return `<li class="eqrow"><div class="eq-head"><div class="li-main"><b>${esc(e.name)}</b><span class="muted">${esc(EQUIP[e.type]?.label||e.type)}${e.vendor?" · "+esc(e.vendor):""}${e.net?" · "+esc(e.net):""}</span></div>
+  return `<li class="eqrow"><div class="eq-head"><div class="li-main"><b>${esc(e.name)}</b><span class="muted">${esc(EQUIP[e.type]?.label||e.type)}${e.vendor?" · "+esc(e.vendor):""}${e.net?" · "+esc(e.net):""}${e.ip?" · "+esc(e.ip):""}</span></div>
       <div class="eq-sw"><span class="eyebrow">Software</span><b class="mono">${esc(e.sw||"—")}</b></div>
       <div class="eq-sw"><span class="eyebrow">Last update</span><b class="mono">${esc(e.updated||"—")}</b></div>
       <div class="row">${ageBadge(e.updated)}${e.remote?'<span class="pill warn">Internet / remote</span>':""}</div>
@@ -980,7 +1003,7 @@ function bindEquipment(s){
     const u={date:v("eu_dt"),from:q.sw||"",to:v("eu_sw"),who:v("eu_by"),note:v("eu_nt"),at:new Date().toISOString(),by:role};
     q.updates=[...(q.updates||[]),u].slice(-30);q.sw=u.to;q.updated=u.date;list[i]=q;ui.eqEdit=null;ui.eqOpen[i]=true;put("ships",s.id,{...strip(s),equipment:list});toast("Update recorded")});
   on("[data-eqsave]","submit",e=>{e.preventDefault();const i=+e.currentTarget.dataset.eqsave;const list=eqs();const v=id=>document.getElementById(id+"_"+i);
-    list[i]={...list[i],name:v("ee_name").value.trim(),type:v("ee_type").value,vendor:v("ee_vendor").value.trim(),sw:v("ee_sw").value.trim(),updated:v("ee_upd").value,net:v("ee_net").value.trim(),remote:v("ee_remote").checked};
+    list[i]={...list[i],name:v("ee_name").value.trim(),type:v("ee_type").value,vendor:v("ee_vendor").value.trim(),sw:v("ee_sw").value.trim(),updated:v("ee_upd").value,net:v("ee_net").value.trim(),ip:v("ee_ip").value.trim(),remote:v("ee_remote").checked};
     ui.eqEdit=null;put("ships",s.id,{...strip(s),equipment:list});toast("Saved")});
 }
 
@@ -1162,7 +1185,7 @@ function netBlock(s){
   const zsel=(id,val,attr,extra="")=>`<select id="${id}" ${attr}>${extra}${Z.map(z=>`<option value="${z.id}" ${z.id===val?"selected":""}>${esc(z.name||ZT[z.type].label)}</option>`).join("")}</select>`;
   const editor=ed?`<div class="neted">
     <div class="eyebrow">1 · Networks on board</div>
-    <ol class="list">${Z.map((z,i)=>`<li><span class="lg k-${ZT[z.type].kind}"></span><label class="f" style="flex:1 1 220px">Name<input id="nz_${z.id}" data-zname="${z.id}" value="${esc(z.name||"")}"></label><span class="muted small" style="flex:1 1 200px">${esc(ZT[z.type].desc)}</span>${z.type==="internet"?"":`<button class="btn small ghost" type="button" data-zdel="${z.id}">Remove</button>`}</li>`).join("")}</ol>
+    <ol class="list">${Z.map((z,i)=>`<li><span class="lg k-${ZT[z.type].kind}"></span><label class="f" style="flex:1 1 220px">Name<input id="nz_${z.id}" data-zname="${z.id}" value="${esc(z.name||"")}"></label>${z.type==="internet"?"":`<label class="f" style="flex:0 1 180px">Address range <span class="muted">(if known)</span><input id="nzc_${z.id}" class="mono" data-zcidr="${z.id}" value="${esc(z.cidr||"")}" placeholder="10.0.20.0/24"></label>`}<span class="muted small" style="flex:1 1 200px">${esc(ZT[z.type].desc)}</span>${z.type==="internet"?"":`<button class="btn small ghost" type="button" data-zdel="${z.id}">Remove</button>`}</li>`).join("")}</ol>
     <div class="row"><select id="nz_add" aria-label="Network to add">${Object.entries(ZT).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join("")}</select><button class="btn small" type="button" id="nzAdd">+ Add network</button></div>
     <div class="eyebrow" style="margin-top:6px">2 · Connections — what sits between two networks?</div>
     <ol class="list">${s.network.links.map((l,i)=>{const A=Z.find(z=>z.id===l.a),B=Z.find(z=>z.id===l.b);if(!A||!B)return"";
@@ -1196,6 +1219,7 @@ function bindNet(s){
   const cp=$("#netCopy");cp&&cp.addEventListener("click",()=>copyText(netText(s)));
   if(!s.network)return;
   on("[data-zname]","change",e=>{const n=N();const z=n.zones.find(z=>z.id===e.target.dataset.zname);z.name=e.target.value.trim()||ZT[z.type].label;save(n)});
+  on("[data-zcidr]","change",e=>{const v=e.target.value.trim();if(v&&!/^\d{1,3}(\.\d{1,3}){3}(\/\d{1,2})?$/.test(v)){toast("Write it like 10.0.20.0/24");return}const n=N();const z=n.zones.find(z=>z.id===e.target.dataset.zcidr);if(v)z.cidr=v;else delete z.cidr;save(n)});
   on("[data-zdel]","click",e=>{const b=e.currentTarget;if(!b.dataset.confirm){b.dataset.confirm=1;b.textContent="Tap again to remove";b.classList.add("primary");return}
     const id=b.dataset.zdel;const n=N();n.zones=n.zones.filter(z=>z.id!==id);n.links=n.links.filter(l=>l.a!==id&&l.b!==id);save(n)});
   const za=$("#nzAdd");za&&za.addEventListener("click",()=>{const t=$("#nz_add").value;const n=N();let id=t,k=2;while(n.zones.some(z=>z.id===id))id=t+"_"+k++;
@@ -1215,24 +1239,313 @@ function bindNet(s){
     ui.netEdit=false;const c={...strip(s)};delete c.network;put("ships",s.id,c)});
 }
 
+/* ================== NETWORK MONITOR: parsing ================== */
+const PORTOF={DNS:53,HTTP:80,HTTPS:443,TLS:443,"TLSV1.2":443,"TLSV1.3":443,SSL:443,SMB:445,SMB2:445,NBNS:137,NBSS:139,RDP:3389,SSH:22,TELNET:23,VNC:5900,NTP:123,DHCP:67,MDNS:5353,SSDP:1900,LLMNR:5355,SNMP:161,MODBUS:502,"MODBUS/TCP":502,S7COMM:102,BACNET:47808,DNP3:20000,FTP:21,SMTP:25,IMAP:143,POP:110};
+const UDPP=new Set(["DNS","NTP","DHCP","MDNS","SSDP","LLMNR","SNMP","NBNS","BACNET","UDP","QUIC"]);
+const REMOTEP={3389:"RDP",5900:"VNC",5800:"VNC",5938:"TeamViewer",7070:"AnyDesk",22:"SSH",23:"Telnet"};
+const OTP={502:"Modbus",102:"Siemens S7",47808:"BACnet",20000:"DNP3",44818:"EtherNet/IP"};
+function splitCSV(line){const out=[];let cur="",q=false;for(let i=0;i<line.length;i++){const c=line[i];if(q){if(c==='"'){if(line[i+1]==='"'){cur+='"';i++}else q=false}else cur+=c}else if(c==='"')q=true;else if(c===","||c===";"&&!line.includes(",")){out.push(cur);cur=""}else cur+=c}out.push(cur);return out.map(s=>s.trim())}
+function toSec(v){if(v===undefined||v==="")return NaN;const n=Number(v);if(!isNaN(n))return n;const m=String(v).match(/^(\d{1,2}):(\d{2}):(\d{2}(?:\.\d+)?)$/);if(m)return +m[1]*3600+ +m[2]*60+ +m[3];const d=Date.parse(v);return isNaN(d)?NaN:d/1000}
+function normProto(p,dport){p=String(p||"").toUpperCase();if(p.startsWith("TLS")||p==="SSL")return "TCP";if(["TCP","UDP","ICMP","ARP","DNS"].includes(p))return p;if(p.startsWith("SMB")||["HTTP","RDP","SSH","TELNET","VNC","MODBUS","MODBUS/TCP","S7COMM","FTP","SMTP","IMAP","POP","NBSS","DNP3"].includes(p))return "TCP";if(UDPP.has(p))return p==="DNS"?"DNS":"UDP";if(p.startsWith("ICMP"))return "ICMP";return p||"IP"}
+function mkPkt(o){
+  const p={t:o.t,src:o.src||"",dst:o.dst||"",proto:"",sp:+o.sp||0,dp:+o.dp||0,len:+o.len||0,fl:o.fl||"",mac:(o.mac||"").toLowerCase(),info:o.info||"",w:+o.w||1};
+  const raw=String(o.proto||"").toUpperCase();if(!p.dp&&PORTOF[raw])p.dp=PORTOF[raw];
+  p.proto=normProto(raw,p.dp);if(p.proto==="UDP"&&(p.dp===53||p.sp===53))p.proto="DNS";if(p.proto==="TCP"&&p.dp===53)p.proto="DNS";
+  return p;
+}
+function parseWireshark(lines){
+  const H=splitCSV(lines[0]).map(h=>h.toLowerCase());const ix=k=>H.findIndex(h=>h===k);
+  const iT=ix("time"),iS=ix("source"),iD=ix("destination"),iP=ix("protocol"),iL=ix("length"),iI=ix("info");const out=[];
+  for(let n=1;n<lines.length;n++){const c=splitCSV(lines[n]);if(c.length<4)continue;const info=c[iI]||"";
+    let sp=0,dp=0;const m=info.match(/(\d{1,5})\s*(?:→|->|>)\s*(\d{1,5})/);if(m){sp=+m[1];dp=+m[2]}
+    else{const a=info.match(/Src Port:\s*(\d+).*?Dst Port:\s*(\d+)/i)||info.match(/Source port:\s*(\d+)\s+Destination port:\s*(\d+)/i);if(a){sp=+a[1];dp=+a[2]}}
+    let fl="";const f=info.match(/\[([A-Z, ]{3,})\]/);if(f){const s=f[1];fl=(s.includes("SYN")?"S":"")+(s.includes("ACK")?".":"")+(s.includes("RST")?"R":"")+(s.includes("FIN")?"F":"")}
+    let src=c[iS],dst=c[iD],mac="";const proto=c[iP];
+    if(/^ARP$/i.test(proto)){const r=info.match(/([\d.]+) is at ([0-9a-f:]{17})/i);if(r){mac=r[2];src=r[1]}else{const w=info.match(/Tell ([\d.]+)/i);if(w)src=w[1]}if(/broadcast/i.test(dst))dst="Broadcast"}
+    let inf=info;if(/unreachable/i.test(info)&&/port unreachable/i.test(info)&&/ICMP/i.test(proto)){const q=info.match(/udp port (\d+)/i);inf="ICMP port unreachable"+(q?" udp port "+q[1]:"")}
+    out.push(mkPkt({t:toSec(c[iT]),src,dst,proto,sp,dp,len:c[iL],fl,mac,info:inf}));
+  }
+  return out;
+}
+function splitHP(s){s=s.replace(/[:,]$/,"");const p=s.split(".");if(p.length===5&&p.slice(0,4).every(x=>/^\d+$/.test(x)))return [p.slice(0,4).join("."),/^\d+$/.test(p[4])?+p[4]:0];return [s,0]}
+function parseTcpdump(lines){
+  const out=[];
+  for(const line of lines){
+    const m=line.match(/^(\d+\.\d+|\d{1,2}:\d{2}:\d{2}\.\d+)\s+(?:([0-9a-f:]{17}) > ([0-9a-f:]{17}|Broadcast)[^:]*?length \d+:\s+)?(.*)$/i);if(!m)continue;
+    const t=toSec(m[1]);const mac=m[2]||"";let rest=m[4];const lens=[...line.matchAll(/length (\d+)/g)];const len=lens.length?+lens[lens.length-1][1]:0;
+    if(/^(ARP|Request who-has|Reply )/.test(rest)){const r=rest.match(/Reply ([\d.]+) is-at ([0-9a-f:]{17})/i);const w=rest.match(/who-has ([\d.]+) tell ([\d.]+)/i);
+      out.push(mkPkt({t,src:r?r[1]:w?w[2]:"",dst:"Broadcast",proto:"ARP",mac:r?r[2]:mac,info:rest.slice(0,120),len}));continue}
+    const i=rest.match(/^(?:IP6?\s+)?(?:\(.*?\)\s+)?([0-9A-Fa-f.:]+) > ([0-9A-Fa-f.:]+): (.*)$/);if(!i)continue;
+    const [src,sp]=splitHP(i[1]),[dst,dp]=splitHP(i[2]);const info=i[3];let proto="IP",fl="";
+    if(/^Flags/.test(info)){proto="TCP";const f=info.match(/Flags \[([^\]]+)\]/);fl=f?f[1]:""}else if(/^ICMP/.test(info))proto="ICMP";else if(dp===53||sp===53)proto="DNS";else if(/UDP/.test(info)||dp)proto="UDP";
+    out.push(mkPkt({t,src,dst,proto,sp,dp,len,fl,mac,info:info.slice(0,160)}));
+  }
+  return out;
+}
+function parseGeneric(lines){
+  const H=splitCSV(lines[0]).map(h=>h.toLowerCase().replace(/[\s.]/g,"_"));
+  const find=(...ks)=>H.findIndex(h=>ks.includes(h));
+  const iT=find("time","timestamp","date","datetime","ts","start","start_time"),iS=find("src","source","src_ip","srcip","srcaddr","source_ip","source_address"),iD=find("dst","destination","dst_ip","dstip","dstaddr","destination_ip","destination_address");
+  const iP=find("proto","protocol","service_protocol"),iSp=find("sport","src_port","srcport","source_port"),iDp=find("dport","dst_port","dstport","destination_port","port","service");
+  const iL=find("length","bytes","len","size","sentbyte","bytes_sent"),iF=find("flags","tcp_flags"),iM=find("smac","src_mac","source_mac","mac"),iI=find("info","message","msg","action","description"),iW=find("packets","count","pkts");
+  if(iS<0||iD<0)return null;const out=[];
+  for(let n=1;n<lines.length;n++){const c=splitCSV(lines[n]);if(c.length<2)continue;
+    out.push(mkPkt({t:iT>=0?toSec(c[iT]):n,src:c[iS],dst:c[iD],proto:iP>=0?c[iP]:"",sp:iSp>=0?c[iSp]:0,dp:iDp>=0?c[iDp]:0,len:iL>=0?c[iL]:0,fl:iF>=0?c[iF]:"",mac:iM>=0?c[iM]:"",info:iI>=0?c[iI]:"",w:iW>=0?Math.max(1,+c[iW]||1):1}))}
+  return out;
+}
+function parseCapture(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());if(!lines.length)throw new Error("The file is empty.");
+  const h=lines[0].toLowerCase();let pk,fmt;
+  if(/"?no\.?"?\s*,\s*"?time"?/.test(h)&&h.includes("source")){pk=parseWireshark(lines);fmt="Wireshark CSV"}
+  else if(/^(\d+\.\d+|\d{1,2}:\d{2}:\d{2}\.\d+)\s/.test(lines[0])){pk=parseTcpdump(lines);fmt="tcpdump text"}
+  else{pk=parseGeneric(lines);fmt=h.startsWith("time,src,dst,proto")?"Pruva monitor recording":"CSV log"}
+  if(!pk||!pk.length)throw new Error("This file could not be read. Use a Wireshark CSV export, tcpdump text output, a firewall log in CSV, or a Pruva monitor recording.");
+  return {pk,fmt};
+}
+
+/* ================== NETWORK MONITOR: analysis ================== */
+const ip4=s=>/^\d{1,3}(\.\d{1,3}){3}$/.test(s);
+const ipNum=s=>s.split(".").reduce((a,b)=>a*256+ +b,0);
+function inCidr(ip,c){if(!ip4(ip)||!c)return false;const [b,m]=c.split("/");if(!ip4(b))return false;const bits=m===undefined?32:+m;if(bits===0)return true;const mask=Math.pow(2,32)-Math.pow(2,32-bits);return Math.floor(ipNum(ip)/Math.pow(2,32-bits))===Math.floor(ipNum(b)/Math.pow(2,32-bits))}
+function isPriv(ip){if(!ip4(ip))return /^(fe80|fc|fd)/i.test(ip);const [a,b]=ip.split(".").map(Number);return a===10||(a===172&&b>=16&&b<=31)||(a===192&&b===168)||(a===169&&b===254)||(a===100&&b>=64&&b<=127)}
+const isBcast=ip=>ip==="Broadcast"||ip==="255.255.255.255"||/\.255$/.test(ip)||/^ff:ff:ff/i.test(ip);
+const isMcast=ip=>ip4(ip)&&+ip.split(".")[0]>=224&&+ip.split(".")[0]<=239;
+const isExt=ip=>ip4(ip)&&!isPriv(ip)&&!isBcast(ip)&&!isMcast(ip)&&!ip.startsWith("127.")&&ip!=="0.0.0.0";
+function hostLabel(ship,ip){const e=(ship.equipment||[]).find(e=>e.ip&&e.ip.trim()===ip);if(e)return `${ip} (${e.name})`;const z=(ship.network?.zones||[]).find(z=>z.cidr&&inCidr(ip,z.cidr));return z?`${ip} (${z.name})`:ip}
+function zoneOfIp(ship,ip){if(isExt(ip))return (ship.network?.zones||[]).find(z=>z.type==="internet")||{id:"_ext",type:"internet",name:"Internet"};return (ship.network?.zones||[]).find(z=>z.cidr&&inCidr(ip,z.cidr))||null}
+function analyzeTraffic(pk,ship,base){
+  pk=pk.filter(p=>!isNaN(p.t));pk.sort((a,b)=>a.t-b.t);
+  const N=pk.reduce((s,p)=>s+p.w,0);const t0=pk.length?pk[0].t:0,t1=pk.length?pk[pk.length-1].t:0;const dur=Math.max(1,t1-t0);
+  const bs=dur<=3600?1:Math.ceil(dur/3600);const nb=Math.floor(dur/bs)+1;const bins=new Array(nb).fill(0);
+  const bySrc=new Map(),byDst=new Map(),proto=new Map(),bytesOut=new Map();
+  const syn=new Map(),synack=new Map(),echo=new Map(),udpTo=new Map(),arp=new Map(),arpBy=new Map(),smb=new Map(),pairs=new Map(),dnsQ=new Map(),dportsOn=new Map();
+  let bcast=0,dnsUnreach=0,longDns=0,dupArp=0;const remote=[],otExt=[],bogus=new Map(),zoneX=new Map(),hosts=new Set();
+  const inc=(m,k,v=1)=>m.set(k,(m.get(k)||0)+v);const addSet=(m,k,v)=>{let s=m.get(k);if(!s){s=new Set();m.set(k,s)}s.add(v)};
+  const zonesDefined=(ship.network?.zones||[]).some(z=>z.cidr);
+  for(const p of pk){const w=p.w;bins[Math.min(nb-1,Math.floor((p.t-t0)/bs))]+=w;inc(bySrc,p.src,w);inc(byDst,p.dst,w);inc(proto,p.proto,w);
+    if(isPriv(p.src)&&ip4(p.src))hosts.add(p.src);
+    if(p.proto==="ARP"){bcast+=w;const r=p.info.match(/is[- ]at ([0-9a-f:]{17})/i);const mac=r?r[1].toLowerCase():"";if(mac&&p.src){addSet(arp,p.src,mac);addSet(arpBy,mac,p.src)}if(/duplicate use/i.test(p.info))dupArp++;continue}
+    if(isBcast(p.dst))bcast+=w;
+    if(p.proto==="TCP"){const f=p.fl;const isSyn=/S/.test(f)&&!/\./.test(f)&&!/A/.test(f);const isSynAck=/S/.test(f)&&(/\./.test(f)||/A/.test(f));
+      if(isSyn){inc(syn,p.dst,w);if((p.dp===445||p.dp===139)&&isPriv(p.src)&&isPriv(p.dst))addSet(smb,p.src,p.dst)}
+      if(isSynAck)inc(synack,p.src,w);
+      if(REMOTEP[p.dp]&&isExt(p.src)&&isPriv(p.dst)&&(isSyn||!f))remote.push(p);
+    }
+    if(OTP[p.dp]&&(isExt(p.src)||isExt(p.dst)))otExt.push(p);
+    if(p.dp){addSet(pairs,p.src,p.dst+":"+p.dp);addSet(dportsOn,p.src+">"+p.dst,p.dp)}
+    if(p.proto==="ICMP"){if(/echo request|echo \(ping\) request/i.test(p.info))inc(echo,p.dst,w);if(/port unreachable|udp port 53 unreachable/i.test(p.info)&&/53/.test(p.info))dnsUnreach+=w}
+    if(p.proto==="UDP"&&p.dp&&![53,123,67,68,5353,1900,5355].includes(p.dp))inc(udpTo,p.dst+":"+p.dp,w);
+    if(p.proto==="DNS"&&p.dp===53){inc(dnsQ,p.src,w);const q=p.info.match(/(?:A\?|AAAA\?|TXT\?|query(?: 0x[0-9a-f]+)? \w+)\s+([^\s]+)/i);if(q&&q[1].split(".").some(l=>l.length>40))longDns+=w}
+    if(p.src==="0.0.0.0"&&p.dp!==67||/^127\./.test(p.src)||isBcast(p.src)||isMcast(p.src)||(p.src===p.dst&&p.src))inc(bogus,p.src+" → "+p.dst,w);
+    if(isPriv(p.src)&&isExt(p.dst))inc(bytesOut,p.dst,p.len*w);
+    if(zonesDefined&&ip4(p.src)&&ip4(p.dst)){const za=zoneOfIp(ship,p.src),zb=zoneOfIp(ship,p.dst);
+      if(za&&zb&&za.id!==zb.id)inc(zoneX,za.id+"|"+zb.id,w);
+      else if(!za&&isPriv(p.src))inc(bogus,"unknown "+p.src,w)}
+  }
+  const peak=Math.max(...bins);const peakI=bins.indexOf(peak);const peakPps=peak/bs;const avg=N/dur;
+  const sorted=[...bins].sort((a,b)=>a-b);const p95=sorted[Math.floor(sorted.length*.95)]/bs;
+  let peakSrc=new Map();if(peak){const a=t0+peakI*bs,b=a+bs;for(const p of pk){if(p.t<a)continue;if(p.t>=b)break;inc(peakSrc,p.src,p.w)}}
+  const top=(m,n)=>[...m.entries()].sort((a,b)=>b[1]-a[1]).slice(0,n);
+  const L=ip=>hostLabel(ship,ip);const A=[];const add=(sev,kind,key,title,plain,todo,scen,ev={})=>A.push({id:kind+":"+key,sev,kind,title,plain,todo,scen,ev});
+  // --- floods / DoS / DDoS
+  const pkTop=top(peakSrc,1)[0];const thr=Math.max(300,base?base.p95*5:0);
+  if(peakPps>=thr){
+    const share=pkTop?pkTop[1]/peak:0;const nsrc=peakSrc.size;
+    if(share>.5)add("bad","dos",pkTop[0],`One device is flooding the network: ${L(pkTop[0])}`,`At the busiest moment it sent ${Math.round(share*100)}% of all traffic (${Math.round(peakPps)} packets per second${base?`, ${Math.round(peakPps/Math.max(1,base.p95))}× more than normal`:""}). Other systems may become slow or stop.`,`Find this device and take it off the network. If it is a ship system, tell the ETO first. Then follow the emergency guide.`,isPriv(pkTop[0])?"dos":"ddos",{src:pkTop[0],count:Math.round(peakPps)+" pkt/s"});
+    else if(nsrc>50&&[...peakSrc.keys()].filter(isExt).length>nsrc*.7)add("bad","ddos","peak",`Many internet addresses are flooding the ship (${nsrc} senders at once)`,`This looks like a DDoS attack on the satellite link. It cannot be stopped on board.`,`Switch to the backup link and ask the satellite provider to filter the attack.`,"ddos",{count:nsrc+" senders"});
+    else if(base)add("warn","spike","peak",`Traffic is ${Math.round(peakPps/Math.max(1,base.p95))}× higher than normal`,`At the busiest moment there were ${Math.round(peakPps)} packets per second. Normal busy level is about ${Math.round(base.p95)}.`,`Check what is running. If many systems are slow, check for a looped cable.`,"flood",{count:Math.round(peakPps)+" pkt/s"});
+  }
+  top(syn,5).forEach(([d,n])=>{const r=n/dur;const ack=synack.get(d)||0;if(n>=200&&r>20&&ack<n*.2)add("bad","syn",d,`SYN flood against ${L(d)}`,`${n} connection requests in ${Math.round(dur)} seconds, almost none answered. The device is being overloaded on purpose or by a broken program.`,`Ask IT support to block the sender and switch on flood protection. Follow the emergency guide.`,"flood",{dst:d,proto:"TCP",count:n,msg:"SYN without SYN-ACK"})});
+  top(echo,3).forEach(([d,n])=>{if(n/dur>50)add("bad","icmp",d,`Ping flood against ${L(d)}`,`${n} pings in ${Math.round(dur)} seconds.`,`Ask IT support to limit pings and find the sender.`,"flood",{dst:d,proto:"ICMP",count:n})});
+  top(udpTo,3).forEach(([k,n])=>{if(n/dur>300){const [d,port]=k.split(":");add("bad","udp",k,`UDP flood against ${L(d)} port ${port}`,`${n} UDP packets in ${Math.round(dur)} seconds.`,`Ask IT support to block the sender.`,"flood",{dst:d,proto:"UDP",port,count:n})}});
+  if(N&&bcast/N>.4&&bcast/dur>100)add("bad","bcast","all",`Broadcast storm: ${Math.round(bcast/N*100)}% of traffic is broadcast`,`The network is full of messages sent to everyone. On ships this is usually a cable plugged into the same switch twice (a loop).`,`Look in the network cabinets for a looped cable and unplug it.`,"flood",{count:bcast});
+  // --- MITM / ARP
+  arp.forEach((macs,ip)=>{if(macs.size>1)add("bad","arp",ip,`Two devices claim to be ${L(ip)}`,`Different network cards (${[...macs].slice(0,3).join(", ")}) answer for the same address. Someone may be pretending to be this device to read or change traffic (man-in-the-middle).`,`Look for unknown devices in the network cabinets. Do not log in to anything from this network until IT support checks it.`,"mitm",{dst:ip,proto:"ARP",msg:[...macs].join(" / ")})});
+  if(dupArp)add("bad","arpdup","w",`Duplicate address warnings in the recording`,`Wireshark saw the same address used by two devices ${dupArp} times — a sign of address spoofing.`,`Follow the emergency guide for man-in-the-middle.`,"mitm",{proto:"ARP",count:dupArp});
+  arpBy.forEach((ips,mac)=>{if(ips.size>=10)add("bad","arpmany",mac,`One device claims ${ips.size} different addresses`,`Network card ${mac} answers for many addresses. This is typical for ARP spoofing tools.`,`Find the device with this network card and unplug it.`,"mitm",{msg:mac,count:ips.size})});
+  // --- ransomware / scanning
+  smb.forEach((ds,s)=>{if(ds.size>=6)add("bad","smb",s,`${L(s)} is trying file sharing on ${ds.size} computers`,`This is how ransomware spreads from one computer to the next.`,`Take ${s} off the network now — pull out its network cable. Follow the emergency guide for ransomware.`,"ransomware",{src:s,proto:"TCP",port:445,count:ds.size})});
+  pairs.forEach((set,s)=>{if(set.size>100&&isPriv(s)&&!smb.has(s))add("bad","scan",s,`${L(s)} is scanning the network`,`It tried ${set.size} different devices and ports in a short time. Harmful programs do this to find their next target.`,`Find this device and take it off the network. Tell company IT.`,"ransomware",{src:s,count:set.size})});
+  const out=top(bytesOut,1)[0];const totOut=[...bytesOut.values()].reduce((a,b)=>a+b,0);
+  if(out&&out[1]>50e6&&out[1]>totOut*.5)add("warn","upload",out[0],`Large upload to one internet address`,`${(out[1]/1e6).toFixed(0)} MB went to ${out[0]}. Ransomware often copies files out before locking them.`,`Ask company IT whether this upload is expected (for example a planned backup).`,"ransomware",{dst:out[0],count:(out[1]/1e6).toFixed(0)+" MB"});
+  // --- remote access / OT exposure
+  const rem=new Map();remote.forEach(p=>addSet(rem,p.dst+":"+p.dp,p.src));
+  [...rem.entries()].sort((a,b)=>b[1].size-a[1].size).slice(0,4).forEach(([k,srcs])=>{const [d,port]=k.split(":");const z=zoneOfIp(ship,d);const ot=z&&ZT[z.type]?.kind==="ot";const n=remote.filter(p=>p.dst===d&&String(p.dp)===port).length;
+    add(ot?"bad":"warn","remote",k,`Remote login attempts from the internet to ${L(d)} (${REMOTEP[port]})`,`${srcs.size} internet address${srcs.size>1?"es":""} tried ${n} time${n>1?"s":""} to log in from outside the ship.`,`Check that the remote access box is switched off and the firewall blocks this. Tell company IT.`,"mitm",{src:[...srcs].slice(0,5).join(", "),dst:d,proto:"TCP",port,count:n})});
+  if(otExt.length){const p=otExt[0];add("bad","otext",p.src+p.dst,`Ship control traffic (${OTP[p.dp]}) is going to or from the internet`,`Engine or cargo control protocols must never cross the satellite link. ${L(p.src)} ↔ ${L(p.dst)}.`,`Disconnect the engine/cargo network from the internet link and tell company IT immediately.`,"dos",{src:p.src,dst:p.dst,proto:"TCP",port:p.dp,count:otExt.length})}
+  // --- DNS
+  if(dnsUnreach>=5)add("warn","dns","u",`The DNS server did not answer ${dnsUnreach} times`,`Computers asked for internet addresses and got "udp port 53 unreachable". Internet and e-mail may stop working. Many failures at once can mean an attack on the DNS server or a broken router.`,`Check that the router / DNS server is running. If it is overloaded, follow the emergency guide for DoS.`,"dos",{proto:"ICMP",port:53,count:dnsUnreach,msg:"udp port 53 unreachable"});
+  top(dnsQ,2).forEach(([s,n])=>{if(n/dur>20)add("warn","dnsq",s,`${L(s)} sends very many DNS requests`,`${n} requests in ${Math.round(dur)} seconds. Harmful programs sometimes hide data in DNS requests.`,`Ask company IT to check this computer.`,"ransomware",{src:s,proto:"DNS",port:53,count:n})});
+  if(longDns>=5)add("warn","dnslong","l",`Unusual very long DNS names`,`${longDns} requests used very long names — a sign of data being smuggled out through DNS.`,`Ask company IT to check the computers sending them.`,"ransomware",{proto:"DNS",count:longDns});
+  // --- spoofing / unknown devices
+  top(bogus,4).forEach(([k,n])=>{const unk=k.startsWith("unknown ");add(unk?"warn":"bad","spoof",k,unk?`Traffic from an address that is not on any ship network: ${k.slice(8)}`:`Fake sender address: ${k}`,unk?`This address is not inside any address range of the network diagram. It may be a new device, a wrong setting, or a fake address.`:`These packets carry a sender address that cannot be real. This is typical for IP spoofing.`,unk?`Find the device. If nobody knows it, unplug it and tell the SSO.`:`Ask IT support to switch on anti-spoofing protection at the firewall and switches.`,"ipspoof",{src:k,count:n})});
+  if(base&&base.hosts){const known=new Set([...base.hosts,...(ship.equipment||[]).map(e=>(e.ip||"").trim()).filter(Boolean)]);const nw=[...hosts].filter(h=>!known.has(h));
+    if(nw.length)add("warn","newhost",nw.slice(0,5).join(","),`${nw.length} new device${nw.length>1?"s":""} on the network`,`Not seen in the normal-traffic recording: ${nw.slice(0,6).map(L).join(", ")}${nw.length>6?"…":""}.`,`Check whether these are new crew laptops or equipment. An unknown device can be an attacker's device.`,"mitm",{src:nw.slice(0,6).join(", "),count:nw.length})}
+  // --- traffic between networks against the diagram
+  if(zonesDefined){const Z={};ship.network.zones.forEach(z=>Z[z.id]=z);
+    const pathOf=(a,b)=>{const seen=new Set([a]);const q=[a];while(q.length){const c=q.shift();if(c===b)return true;ship.network.links.forEach(l=>{if(l.prot==="off")return;const o=l.a===c?l.b:l.b===c?l.a:null;if(o&&!seen.has(o)){seen.add(o);q.push(o)}})}return false};
+    zoneX.forEach((n,k)=>{const [a,b]=k.split("|");const za=Z[a]||{type:"internet",name:"Internet"},zb=Z[b]||{type:"internet",name:"Internet"};const ka=ZT[za.type]?.kind,kb=ZT[zb.type]?.kind;
+      if(ka==="crew"&&kb!=="ext"&&kb!=="edge"||kb==="crew"&&ka!=="ext"&&ka!=="edge")add("bad","zone",k,`Crew Wi-Fi is talking to the ${ka==="crew"?zb.name:za.name}`,`${n} packets went between the crew network and a ship network. Crew devices should reach only the internet.`,`Ask IT support to block this at the firewall. Check the crew network is separated.`,"mitm",{msg:`${za.name} → ${zb.name}`,count:n});
+      else if((ka==="ext"&&kb==="ot")||(kb==="ext"&&ka==="ot")){const ot=ka==="ot"?za:zb;const viaProxy=ship.network.links.some(l=>[l.a,l.b].includes(ot.id)&&l.prot==="fwproxy");
+        if(!viaProxy)add("warn","zone",k,`The ${ot.name} talks to the internet directly`,`${n} packets between the ${ot.name} and internet addresses. Ship systems should get updates through a proxy or update area, not directly.`,`Ask company IT to route updates through a proxy server and block direct internet access from this network.`,"dos",{msg:`${za.name} ↔ ${zb.name}`,count:n})}
+      else if(Z[a]&&Z[b]&&!pathOf(a,b)&&ka!=="ext"&&kb!=="ext"&&ka!=="edge"&&kb!=="edge")add("warn","zone",k,`Traffic between ${za.name} and ${zb.name}`,`${n} packets went between these networks, but in the network diagram there is no way between them (or the connection is marked "normally unplugged").`,`Find out how they are connected. Update the diagram or remove the connection.`,"mitm",{msg:`${za.name} → ${zb.name}`,count:n});
+    })}
+  const seen=new Set();const alerts=A.filter(a=>seen.has(a.id)?false:seen.add(a.id)).sort((x,y)=>SEVORD[x.sev]-SEVORD[y.sev]);
+  const step=Math.ceil(bins.length/90);const series=[];for(let i=0;i<bins.length;i+=step){let m=0;for(let j=i;j<Math.min(bins.length,i+step);j++)m=Math.max(m,bins[j]);series.push(Math.round(m/bs))}
+  return {packets:N,duration:Math.round(dur),bucket:bs,avg:Math.round(avg*10)/10,peak:Math.round(peakPps),p95:Math.round(p95*10)/10,series,
+    protos:top(proto,6).map(([p,n])=>({p,n})),talkers:top(bySrc,8).map(([ip,n])=>({ip,n,label:L(ip)})),hostCount:hosts.size,hosts:[...hosts].slice(0,500),alerts};
+}
+
+/* ================== NETWORK MONITOR: sample data ================== */
+function sampleTraffic(){
+  const P=[];let t=1730800000;const push=(dt,o)=>P.push(mkPkt({t:t+dt,...o}));const R=n=>Math.random()*n;
+  for(let s=0;s<120;s++){
+    for(let k=0;k<25;k++){const d=s+R(1);push(d,{src:"10.0.10.11",dst:"52.97.146.10",proto:"TCP",sp:50000+k,dp:443,fl:".",len:600+R(800)});push(d+.01,{src:"52.97.146.10",dst:"10.0.10.11",proto:"TCP",sp:443,dp:50000+k,fl:".",len:1400})}
+    for(let k=0;k<6;k++)push(s+R(1),{src:"10.0.40."+(7+k%4),dst:"142.250.74."+(10+k),proto:"TCP",sp:41000+k,dp:443,fl:".",len:1200});
+    for(let k=0;k<10;k++)push(s+R(1),{src:"10.0.30.10",dst:"10.0.30.20",proto:"TCP",sp:1502,dp:502,fl:".",len:80});
+    push(s+R(1),{src:"10.0.10.11",dst:"10.0.10.1",proto:"DNS",sp:5353,dp:53,info:"1234+ A? outlook.office365.com. (35)",len:70});
+    if(s%10===0)push(s+.5,{src:"10.0.20.5",dst:"10.0.20.1",proto:"UDP",sp:123,dp:123,len:76});
+    if(s%15===0)push(s+.2,{src:"10.0.10.1",dst:"Broadcast",proto:"ARP",mac:"00:11:22:33:44:55",info:"Reply 10.0.10.1 is-at 00:11:22:33:44:55, length 28"});
+  }
+  for(let s=60;s<80;s++)for(let k=0;k<420;k++)push(s+R(1),{src:"10.0.10.23",dst:"10.0.20.5",proto:"TCP",sp:1024+Math.floor(R(60000)),dp:80,fl:"S",len:60});
+  for(let i=30;i<46;i++)push(90+i*.05,{src:"10.0.10.23",dst:"10.0.10."+i,proto:"TCP",sp:49152+i,dp:445,fl:"S",len:66});
+  for(let s=95;s<110;s+=2)push(s,{src:"10.0.10.1",dst:"Broadcast",proto:"ARP",mac:"de:ad:be:ef:00:01",info:"Reply 10.0.10.1 is-at de:ad:be:ef:00:01, length 28"});
+  for(let k=0;k<22;k++)push(40+k*1.5,{src:"10.0.10.1",dst:"10.0.10.11",proto:"ICMP",info:"ICMP 10.0.10.1 udp port 53 unreachable, length 64",len:98});
+  for(let k=0;k<12;k++)push(100+k,{src:"10.0.40.7",dst:"10.0.30.10",proto:"TCP",sp:52000+k,dp:502,fl:"S",len:60});
+  for(let k=0;k<5;k++)push(20+k*7,{src:"185.220.101."+(3+k),dst:"10.0.20.5",proto:"TCP",sp:40000+k,dp:3389,fl:"S",len:60});
+  return P;
+}
+
+const MONITOR_PY="#!/usr/bin/env python3\n\"\"\"\nPruva Cyber - on-board network monitor\n=====================================\n\nWatches the ship's network traffic, raises alerts when something looks wrong,\nand saves a recording every 15 minutes that you can load into the Pruva Cyber\napp (Network monitor page) for a full check.\n\nBefore you start\n  * Get permission from the Master and company IT.\n  * Use a computer (Linux or macOS) connected to the switch \"mirror\" / \"SPAN\"\n    port, so it can see the traffic of the other devices.\n  * tcpdump and Python 3 must be installed (most Linux computers have both).\n\nStart\n    sudo python3 pruva_monitor.py --iface eth0\n\nOptional\n    --known 10.0.10.1=00:11:22:33:44:55   gateway MAC from your inventory (repeatable)\n    --mail-to eto@ship.com --smtp smtp.company.com:587 --mail-from monitor@ship.com\n        (password from the PRUVA_SMTP_PASS environment variable)\n    --rotate 15     minutes per recording file\n    --learn 10      minutes to learn what is normal before rate alerts start\n\nStop with Ctrl+C. Alerts are printed, beep, and are written to alerts.log.\n\"\"\"\nimport argparse, collections, csv, datetime as dt, ipaddress, os, re, smtplib, subprocess, sys, time\nfrom email.message import EmailMessage\n\nETH = re.compile(r'^(?P<t>\\d+\\.\\d+)\\s+(?:(?P<smac>[0-9a-f:]{17}) > (?P<dmac>[0-9a-f:]{17}|Broadcast|ff:ff:ff:ff:ff:ff)[^:]*?length \\d+:\\s+)?(?P<rest>.*)$')\nIPL = re.compile(r'^(?:IP6?\\s+)?(?:\\(.*?\\)\\s+)?(?P<src>[0-9A-Fa-f.:]+) > (?P<dst>[0-9A-Fa-f.:]+): (?P<info>.*)$')\nARP_REPLY = re.compile(r'(?:ARP, )?Reply (?P<ip>[\\d.]+) is-at (?P<mac>[0-9a-f:]{17})')\nREMOTE_PORTS = {3389: \"RDP\", 5900: \"VNC\", 5800: \"VNC\", 5938: \"TeamViewer\", 7070: \"AnyDesk\", 22: \"SSH\", 23: \"Telnet\"}\nOT_PORTS = {502: \"Modbus\", 102: \"S7\", 47808: \"BACnet\", 20000: \"DNP3\", 44818: \"EtherNet/IP\"}\n\ndef split_hp(s):\n    s = s.rstrip(':,')\n    parts = s.split('.')\n    if len(parts) == 5 and all(p.isdigit() for p in parts[:4]):\n        return '.'.join(parts[:4]), (int(parts[4]) if parts[4].isdigit() else None)\n    return s, None\n\ndef is_private(ip):\n    try:\n        a = ipaddress.ip_address(ip)\n        return a.is_private or a.is_link_local or ip.startswith(\"100.\")\n    except ValueError:\n        return True\n\ndef is_external(ip):\n    try:\n        a = ipaddress.ip_address(ip)\n        return not (a.is_private or a.is_link_local or a.is_multicast or a.is_loopback or ip.endswith(\".255\") or ip.startswith(\"100.\"))\n    except ValueError:\n        return False\n\ndef parse(line):\n    m = ETH.match(line)\n    if not m:\n        return None\n    t = float(m.group('t')); rest = m.group('rest'); smac = m.group('smac') or \"\"\n    p = {\"time\": t, \"src\": \"\", \"dst\": \"\", \"proto\": \"\", \"sport\": \"\", \"dport\": \"\", \"flags\": \"\", \"length\": 0, \"smac\": smac, \"info\": \"\"}\n    lm = re.findall(r'length (\\d+)', line)\n    p[\"length\"] = int(lm[-1]) if lm else 0\n    if rest.startswith((\"ARP\", \"Request who-has\", \"Reply \")):\n        p[\"proto\"] = \"ARP\"; p[\"info\"] = rest[:120]\n        r = ARP_REPLY.search(rest)\n        if r:\n            p[\"src\"] = r.group('ip'); p[\"dst\"] = \"Broadcast\"\n        else:\n            w = re.search(r'who-has ([\\d.]+) tell ([\\d.]+)', rest)\n            if w:\n                p[\"src\"] = w.group(2); p[\"dst\"] = \"Broadcast\"\n        return p\n    i = IPL.match(rest)\n    if not i:\n        return None\n    src, sport = split_hp(i.group('src')); dst, dport = split_hp(i.group('dst')); info = i.group('info')\n    p.update(src=src, dst=dst, sport=sport or \"\", dport=dport or \"\", info=info[:160])\n    if info.startswith(\"Flags\"):\n        p[\"proto\"] = \"TCP\"; f = re.search(r'Flags \\[([^\\]]+)\\]', info); p[\"flags\"] = f.group(1) if f else \"\"\n    elif info.startswith(\"ICMP\"):\n        p[\"proto\"] = \"ICMP\"\n    elif dport == 53 or sport == 53:\n        p[\"proto\"] = \"DNS\"\n    else:\n        p[\"proto\"] = \"UDP\" if (\"UDP\" in info or dport) else \"IP\"\n    return p\n\nclass Monitor:\n    def __init__(a, args):\n        a.args = args; a.known = dict(k.split(\"=\", 1) for k in (args.known or []))\n        a.arp = {}; a.window = []; a.learn_until = time.time() + args.learn * 60; a.learned = []; a.base = None\n        a.last_alert = {}; a.out = None; a.rows = 0; a.file_start = 0\n        os.makedirs(args.out, exist_ok=True)\n        a.reset()\n\n    def reset(a):\n        a.w_start = time.time(); a.total = 0; a.by_src = collections.Counter(); a.syn = collections.Counter(); a.synack = collections.Counter()\n        a.echo = collections.Counter(); a.bcast = 0; a.dns_unreach = 0; a.smb = collections.defaultdict(set); a.ports = collections.defaultdict(set)\n\n    def alert(a, key, sev, text, todo):\n        now = time.time()\n        if now - a.last_alert.get(key, 0) < 600:\n            return\n        a.last_alert[key] = now\n        stamp = dt.datetime.now(dt.timezone.utc).strftime(\"%Y-%m-%d %H:%M UTC\")\n        msg = f\"[{stamp}] {sev}: {text}\\n    What to do: {todo}\"\n        colour = \"\\033[91m\" if sev == \"ALERT\" else \"\\033[93m\"\n        print(f\"\\a{colour}{msg}\\033[0m\", flush=True)\n        with open(os.path.join(a.args.out, \"alerts.log\"), \"a\", encoding=\"utf-8\") as f:\n            f.write(msg + \"\\n\")\n        if a.args.mail_to and a.args.smtp:\n            try:\n                host, _, port = a.args.smtp.partition(\":\"); port = int(port or 587)\n                em = EmailMessage(); em[\"Subject\"] = f\"Pruva Cyber {sev}: {text[:70]}\"; em[\"From\"] = a.args.mail_from or a.args.mail_to; em[\"To\"] = a.args.mail_to\n                em.set_content(msg)\n                with smtplib.SMTP(host, port, timeout=20) as s:\n                    if port == 587:\n                        s.starttls()\n                    if os.environ.get(\"PRUVA_SMTP_PASS\"):\n                        s.login(a.args.mail_from or a.args.mail_to, os.environ[\"PRUVA_SMTP_PASS\"])\n                    s.send_message(em)\n            except Exception as e:\n                print(f\"    (could not send e-mail: {e})\")\n\n    def record(a, p):\n        now = time.time()\n        if a.out is None or now - a.file_start > a.args.rotate * 60:\n            if a.out:\n                a.out.close()\n                print(f\"Saved recording: {a.path}  -> load it in the app (Network monitor)\")\n            a.path = os.path.join(a.args.out, dt.datetime.now().strftime(\"pruva_%Y%m%d_%H%M.csv\"))\n            a.out = open(a.path, \"w\", newline=\"\", encoding=\"utf-8\"); a.csv = csv.DictWriter(a.out, fieldnames=list(p.keys())); a.csv.writeheader()\n            a.rows = 0; a.file_start = now\n        if a.rows < 200000:\n            a.csv.writerow(p); a.rows += 1\n\n    def feed(a, p):\n        a.record(p); a.total += 1; a.by_src[p[\"src\"]] += 1\n        dst, dport, src = p[\"dst\"], p[\"dport\"], p[\"src\"]\n        if p[\"proto\"] == \"ARP\":\n            a.bcast += 1\n            r = ARP_REPLY.search(p[\"info\"])\n            if r:\n                ip, mac = r.group('ip'), r.group('mac')\n                good = a.known.get(ip) or a.arp.get(ip)\n                if good and good.lower() != mac.lower():\n                    a.alert(\"arp\" + ip, \"ALERT\", f\"{ip} is now answering from a different device ({mac}, before {good}). Possible man-in-the-middle.\",\n                            \"Look for an unknown device in the network cabinets. Open the emergency guide: 'Someone may be secretly reading our traffic'.\")\n                a.arp.setdefault(ip, mac)\n            return\n        if dst.endswith(\".255\") or dst == \"255.255.255.255\":\n            a.bcast += 1\n        if p[\"proto\"] == \"TCP\":\n            f = p[\"flags\"]\n            if f == \"S\":\n                a.syn[dst] += 1\n                if dport in (445, 139) and is_private(src) and is_private(dst):\n                    a.smb[src].add(dst)\n            elif f.startswith(\"S.\"):\n                a.synack[src] += 1\n            if dport:\n                a.ports[src].add((dst, dport))\n            if dport in REMOTE_PORTS and is_external(src) and is_private(dst):\n                a.alert(\"rem\" + src + dst, \"ALERT\", f\"Remote login attempt ({REMOTE_PORTS[dport]}) from the internet {src} to {dst}.\",\n                        \"Check the remote access box is switched off and the firewall blocks it. Tell company IT.\")\n            if dport in OT_PORTS and is_external(src):\n                a.alert(\"ot\" + src, \"ALERT\", f\"Ship control protocol {OT_PORTS[dport]} reached from the internet ({src} -> {dst}).\",\n                        \"Disconnect the engine/bridge network from the internet link. Tell company IT immediately.\")\n        if p[\"proto\"] == \"ICMP\":\n            if \"echo request\" in p[\"info\"]:\n                a.echo[dst] += 1\n            if \"udp port 53 unreachable\" in p[\"info\"]:\n                a.dns_unreach += 1\n\n    def check(a):\n        secs = max(1.0, time.time() - a.w_start); pps = a.total / secs\n        if time.time() < a.learn_until:\n            a.learned.append(pps)\n        elif a.base is None and a.learned:\n            s = sorted(a.learned); a.base = s[int(len(s) * .95) - 1 if len(s) > 1 else 0]\n            print(f\"Learned normal traffic: about {a.base:.0f} packets per second at busy times. Rate alerts are now active.\")\n        if a.base and pps > max(200, a.base * 5):\n            top, n = a.by_src.most_common(1)[0]\n            a.alert(\"rate\", \"ALERT\", f\"Traffic is {pps:.0f} packets/second, {pps / a.base:.0f}x more than normal. Biggest sender: {top} ({n * 100 // a.total}%).\",\n                    \"Open the emergency guide: 'The whole network is flooded'. Check for a looped cable first.\")\n        for d, n in a.syn.items():\n            if n / secs > 20 and a.synack[d] < n * .2:\n                a.alert(\"syn\" + d, \"ALERT\", f\"SYN flood: {n} connection attempts to {d} in {secs:.0f} s without answers.\",\n                        \"Open the emergency guide: DoS / Flooding. Ask IT support to block the source.\")\n        for d, n in a.echo.items():\n            if n / secs > 50:\n                a.alert(\"icmp\" + d, \"ALERT\", f\"Ping flood: {n} pings to {d} in {secs:.0f} s.\", \"Ask IT support to rate-limit ICMP and find the source.\")\n        if a.total and a.bcast / a.total > .4 and a.bcast / secs > 100:\n            a.alert(\"bcast\", \"ALERT\", f\"Broadcast storm: {a.bcast * 100 // a.total}% of traffic is broadcast.\",\n                    \"Look for a cable with both ends in the same switch (a loop) and unplug it.\")\n        if a.dns_unreach >= 5:\n            a.alert(\"dns\", \"WARNING\", f\"The DNS server did not answer {a.dns_unreach} times (ICMP 'udp port 53 unreachable').\",\n                    \"Check the DNS server / router is running. Many failures at once can mean an attack or a broken device.\")\n        for s, hosts in a.smb.items():\n            if len(hosts) >= 6:\n                a.alert(\"smb\" + s, \"ALERT\", f\"{s} is trying file sharing (SMB) on {len(hosts)} computers - this is how ransomware spreads.\",\n                        f\"Take {s} off the network now (pull the cable). Open the emergency guide: Ransomware.\")\n        for s, pairs in a.ports.items():\n            if len(pairs) > 100 and is_private(s):\n                a.alert(\"scan\" + s, \"ALERT\", f\"{s} is scanning the network ({len(pairs)} different targets).\",\n                        f\"Find device {s} and take it off the network. Tell company IT.\")\n        a.reset()\n\n    def run(a):\n        cmd = [\"tcpdump\", \"-l\", \"-n\", \"-e\", \"-tt\", \"-i\", a.args.iface]\n        print(\"Starting:\", \" \".join(cmd)); print(f\"Learning normal traffic for {a.args.learn} minutes. Recordings go to: {os.path.abspath(a.args.out)}\")\n        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, bufsize=1)\n        try:\n            for line in proc.stdout:\n                p = parse(line.strip())\n                if p:\n                    a.feed(p)\n                if time.time() - a.w_start >= 60:\n                    a.check()\n        except KeyboardInterrupt:\n            pass\n        finally:\n            proc.terminate()\n            if a.out:\n                a.out.close(); print(f\"Saved recording: {a.path}\")\n            print(\"Monitor stopped.\")\n\nif __name__ == \"__main__\":\n    ap = argparse.ArgumentParser(description=\"Pruva Cyber on-board network monitor\")\n    ap.add_argument(\"--iface\", required=True, help=\"network interface connected to the mirror port, e.g. eth0\")\n    ap.add_argument(\"--out\", default=\"pruva_recordings\"); ap.add_argument(\"--rotate\", type=int, default=15); ap.add_argument(\"--learn\", type=int, default=10)\n    ap.add_argument(\"--known\", action=\"append\", help=\"IP=MAC of an important device, e.g. the gateway\")\n    ap.add_argument(\"--mail-to\"); ap.add_argument(\"--mail-from\"); ap.add_argument(\"--smtp\", help=\"host:port\")\n    args = ap.parse_args()\n    if os.name != \"nt\" and os.geteuid() != 0:\n        print(\"Please start with sudo (needed to read network traffic).\"); sys.exit(1)\n    Monitor(args).run()\n";
+/* ================== NETWORK MONITOR: page ================== */
+const ALSEV={bad:["Alert","bad"],warn:["Warning","warn"],info:["Note","info"]};
+function trafficOf(id){return state.traffic[id]||{ship:id,analyses:[]}}
+function openAlerts(shipId){const T=trafficOf(shipId);const out=[];(T.analyses||[]).forEach(a=>(a.alerts||[]).forEach(x=>{if(!(a.ack||{})[x.id])out.push({...x,an:a})}));return out}
+function alertCount(sev){return state.ships.reduce((t,s)=>t+openAlerts(s.id).filter(a=>!sev||a.sev===sev).length,0)}
+function sparkSVG(a){
+  const s=a.series||[];if(!s.length)return"";const W=640,H=120,pad=26;const max=Math.max(...s,a.base||0,1);
+  const x=i=>pad+(W-pad-6)*(s.length===1?0:i/(s.length-1));const y=v=>H-18-(H-30)*(v/max);
+  const pts=s.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");const pi=s.indexOf(Math.max(...s));
+  const unit=a.bucket>1?`per second (avg of ${a.bucket}s)`:"per second";
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="Packets per second over the recording">
+    <line class="sp-grid" x1="${pad}" x2="${W-6}" y1="${y(max)}" y2="${y(max)}"/><line class="sp-grid" x1="${pad}" x2="${W-6}" y1="${y(0)}" y2="${y(0)}"/>
+    <text class="sp-ax" x="${pad-4}" y="${y(max)+4}" text-anchor="end">${max}</text><text class="sp-ax" x="${pad-4}" y="${y(0)+4}" text-anchor="end">0</text>
+    ${a.base?`<line class="sp-base" x1="${pad}" x2="${W-6}" y1="${y(a.base)}" y2="${y(a.base)}"/><text class="sp-ax" x="${W-8}" y="${y(a.base)-4}" text-anchor="end">normal busy level</text>`:""}
+    <polygon class="sp-area" points="${pad},${y(0)} ${pts} ${x(s.length-1)},${y(0)}"/><polyline class="sp-line" points="${pts}"/>
+    <circle class="sp-pk" cx="${x(pi)}" cy="${y(s[pi])}" r="4"/><text class="sp-ax" x="${Math.min(W-40,x(pi)+6)}" y="${Math.max(12,y(s[pi])-6)}">peak ${s[pi]}</text>
+    <text class="sp-ax" x="${pad}" y="${H-3}">start</text><text class="sp-ax" x="${W-6}" y="${H-3}" text-anchor="end">end · packets ${unit}</text></svg>`;
+}
+function alertItem(a,ship){
+  const g=a.scen&&SCEN[a.scen];
+  return `<li class="alert al-${a.sev}"><span class="rdot" aria-hidden="true"></span><div class="al-main">
+    <div class="row" style="gap:8px"><b>${esc(a.title)}</b><span class="pill ${ALSEV[a.sev][1]}">${ALSEV[a.sev][0]}</span></div>
+    <div class="muted small">${esc(ship.name)} · found ${fmtUTC(a.an.at)} in ${esc(a.an.sample?"sample traffic":a.an.file||"recording")}</div>
+    <p>${esc(a.plain)}</p><div class="al-todo"><b>What to do:</b> ${esc(a.todo)}</div>
+    <div class="row">${g?`<a class="btn small primary" href="#playbook" data-algo="${a.scen}" data-alship="${ship.id}">Open emergency guide: ${esc(g.label.split(" (")[0])}</a>`:""}
+      <button class="btn small" data-alinc="${esc(a.an.id)}|${esc(a.id)}" data-alship="${ship.id}">Start incident report</button>
+      <button class="btn small ghost" data-alack="${esc(a.an.id)}|${esc(a.id)}" data-alship="${ship.id}">I have seen this</button></div></div></li>`;
+}
+function vMonitor(){
+  if(!state.ships.length)return `<div class="head"><div><h1>Network monitor</h1></div></div>`+noShips();
+  const s=state.ships.find(x=>x.id===ui.mnShip)||state.ships[0];ui.mnShip=s.id;
+  const T=trafficOf(s.id);const al=openAlerts(s.id);const last=(T.analyses||[])[0];const base=T.baseline;
+  const zonesWithRange=(s.network?.zones||[]).filter(z=>z.cidr).length;
+  return `<div class="head"><div><h1>Network monitor</h1><p>Checks recordings of the ship's network traffic and warns you when something looks wrong — floods, fake addresses, someone in the middle, ransomware spreading, or networks talking that should not.</p></div></div>
+    <section class="block"><div class="row" style="justify-content:space-between;align-items:flex-end;gap:14px">
+      <label class="f" style="min-width:220px">Ship<select id="mn_ship">${state.ships.map(x=>`<option value="${x.id}" ${x.id===s.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select></label>
+      <div class="row">${al.filter(a=>a.sev==="bad").length?`<span class="pill bad">${al.filter(a=>a.sev==="bad").length} alerts</span>`:""}${al.filter(a=>a.sev==="warn").length?`<span class="pill warn">${al.filter(a=>a.sev==="warn").length} warnings</span>`:""}${!al.length?`<span class="pill ok">No open alerts</span>`:""}${base?`<span class="pill ok">Normal traffic learned ${base.at.slice(0,10)}</span>`:`<span class="pill">Normal traffic not learned yet</span>`}</div></div></section>
+    <section class="block"><h2><span class="q">1</span> Alerts</h2>
+      ${al.length?`<ol class="alerts">${al.map(a=>alertItem(a,s)).join("")}</ol>`:`<div class="empty" style="padding:22px">No open alerts for this ship. Load a recording below to check the traffic.</div>`}</section>
+    <section class="block"><h2><span class="q">2</span> Check a traffic recording</h2>
+      <p class="muted" style="margin:0;max-width:78ch">The ETO or company IT records the traffic (or the Pruva monitor program does it automatically — see step 5) and loads the file here. The check runs in this browser; the recording itself is not uploaded anywhere.</p>
+      <label class="drop" for="mn_file" id="mnDrop"><b>Choose a recording file</b><span class="muted small">or drag it here · Wireshark CSV export, tcpdump text output, firewall log (CSV), or Pruva monitor recording</span></label>
+      <input type="file" id="mn_file" accept=".csv,.txt,.log,text/csv,text/plain" class="visually-hidden">
+      <div class="row"><button class="btn" id="mnSample">Try with sample traffic</button><span class="muted small">Sample traffic contains made-up attacks, to show how alerts look.</span></div>
+      ${zonesWithRange?"":`<div class="notice small">Tip: add the address range of each network (for example 10.0.20.0/24) in the <a href="#filo">network diagram</a>. The monitor can then also warn when networks talk to each other that should not.</div>`}
+    </section>
+    ${last?`<section class="block"><div class="steps-h"><h2><span class="q">3</span> Latest check</h2><span class="muted small">${fmtUTC(last.at)} · ${esc(last.sample?"sample traffic":last.file)} · ${esc(last.fmt||"")}</span></div>
+      <div class="kpis"><div class="kpi"><span>Packets</span><b>${last.packets.toLocaleString("en")}</b></div><div class="kpi"><span>Recording length</span><b>${last.duration<120?last.duration+" s":Math.round(last.duration/60)+" min"}</b></div><div class="kpi"><span>Busiest second</span><b>${last.peak} <small class="muted" style="font-size:.8rem">pkt/s</small></b></div><div class="kpi"><span>Devices seen on board</span><b>${last.hostCount}</b></div></div>
+      <div class="netwrap" style="padding:10px">${sparkSVG({...last,base:base?.p95})}</div>
+      <div class="grid g2"><div><div class="eyebrow" style="margin-bottom:6px">Busiest senders</div><ol class="list">${(last.talkers||[]).map(x=>`<li><span class="mono small" style="flex:1 1 200px">${esc(x.label)}</span><span class="mono small muted">${x.n.toLocaleString("en")}</span><span class="bar"><i style="width:${Math.round(x.n/last.talkers[0].n*100)}%"></i></span></li>`).join("")}</ol></div>
+        <div><div class="eyebrow" style="margin-bottom:6px">Kinds of traffic</div><ol class="list">${(last.protos||[]).map(x=>`<li><span class="mono small" style="flex:1 1 120px">${esc(x.p)}</span><span class="mono small muted">${Math.round(x.n/last.packets*100)}%</span><span class="bar"><i style="width:${Math.round(x.n/last.protos[0].n*100)}%"></i></span></li>`).join("")}</ol></div></div>
+      <div class="row">${(last.alerts||[]).length?`<span class="pill ${last.alerts.some(a=>a.sev==="bad")?"bad":"warn"}">${last.alerts.length} finding${last.alerts.length>1?"s":""}</span>`:`<span class="pill ok">Nothing unusual found</span>`}
+        ${!last.sample&&!last.alerts.some(a=>a.sev==="bad")?`<button class="btn small" data-mnbase="${esc(last.id)}">Use this as normal traffic</button>`:""}</div></section>`:""}
+    <section class="block"><h2><span class="q">4</span> Normal traffic</h2>
+      <p style="margin:0;max-width:78ch">${base?`Learned from a recording of ${fmtUTC(base.at)}: about <b>${Math.round(base.p95)}</b> packets per second at busy times, <b>${base.hosts.length}</b> devices. New devices and traffic much higher than this now raise a warning.`:`The monitor works better when it knows what normal traffic looks like on this ship. Record 15–30 minutes on a normal day with no problems, check it here, and press <b>Use this as normal traffic</b>.`}</p>
+      ${base?`<div class="row"><button class="btn small ghost" id="mnBaseDel">Forget normal traffic</button></div>`:""}</section>
+    <section class="block"><h2><span class="q">5</span> Automatic monitoring on board</h2>
+      <p style="margin:0;max-width:78ch">This page cannot listen to the ship's network by itself. For non-stop monitoring, the ETO or company IT runs the small <b>Pruva monitor</b> program on a computer connected to the network switch. It watches the traffic all the time, <b>beeps and shows an alert at once</b> when it sees an attack, can send an e-mail, and saves a recording every 15 minutes that you load in step 2.</p>
+      <ol class="howto">
+        <li>Get permission from the Master and company IT.</li>
+        <li>Use a Linux or Mac computer. Connect it to the <b>mirror port</b> (also called SPAN or monitor port) of the main switch — company IT or the ETO sets this up.</li>
+        <li>Save the program with the button below and copy it to that computer.</li>
+        <li>Open a terminal and type: <code>sudo python3 pruva_monitor.py --iface eth0</code> (replace <code>eth0</code> with the name of the network port).</li>
+        <li>Leave it running. The first 10 minutes it learns what is normal.</li>
+        <li>Every 15 minutes it saves a file in the <code>pruva_recordings</code> folder. Load the newest one in step 2 for the full check.</li></ol>
+      <div class="row"><button class="btn" id="mnScript">Save the Pruva monitor program</button><button class="btn ghost" id="mnScriptCopy">Copy program text</button></div>
+      <details class="fold"><summary><b>For IT support: how to make a recording by hand</b></summary><div class="howbox" style="margin-top:10px">
+        <div><b>tcpdump (Linux / Mac):</b> <code>sudo tcpdump -n -e -tt -i eth0 -c 200000 &gt; recording.txt</code></div>
+        <div><b>Wireshark (Windows):</b> capture 15–30 minutes, then File → Export Packet Dissections → As CSV.</div>
+        <div><b>Firewall:</b> export the traffic log for the period as CSV (columns for time, source, destination, protocol, port).</div></div></details>
+    </section>
+    ${(T.analyses||[]).length>1?`<section class="block"><h2>Earlier checks</h2><ol class="list">${T.analyses.slice(1).map(a=>`<li><div class="li-main"><b>${esc(a.sample?"Sample traffic":a.file)}</b><span class="muted">${fmtUTC(a.at)} · ${a.packets.toLocaleString("en")} packets · ${byLabel(a.by)}</span></div>${a.alerts.length?`<span class="pill ${a.alerts.some(x=>x.sev==="bad")?"bad":"warn"}">${a.alerts.length} findings</span>`:`<span class="pill ok">Normal</span>`}<button class="btn small ghost" data-mndel="${esc(a.id)}">Delete</button></li>`).join("")}</ol></section>`:""}`;
+}
+async function saveTraffic(shipId,fn){const T=JSON.parse(JSON.stringify(trafficOf(shipId)));fn(T);T.ship=shipId;await put("traffic",shipId,T)}
+async function runCheck(s,pk,file,fmt,sample){
+  const T=trafficOf(s.id);if(pk.length>400000){pk=pk.slice(0,400000);toast("Large file: the first 400,000 lines were checked.")}
+  const r=analyzeTraffic(pk,s,T.baseline);const id=uid("an");
+  const an={id,at:new Date().toISOString(),by:role,file:file||"",fmt,sample:!!sample,...r,ack:{}};delete an.hosts;ui.lastHosts=r.hosts;ui.lastHostsId=id;
+  await saveTraffic(s.id,X=>{X.analyses=[an,...(X.analyses||[])].slice(0,10)});
+  const bad=r.alerts.filter(a=>a.sev==="bad").length;toast(bad?`${bad} alert${bad>1?"s":""} found`:r.alerts.length?`${r.alerts.length} warning${r.alerts.length>1?"s":""} found`:"Nothing unusual found");
+}
+function alertIncident(s,anId,alId){
+  const T=trafficOf(s.id);const an=(T.analyses||[]).find(a=>a.id===anId);const a=an&&an.alerts.find(x=>x.id===alId);if(!a)return;
+  const id=uid("inc");const now=new Date().toISOString();const ev=a.ev||{};
+  const o={...blankInc(),title:a.title,ship:s.id,scenario:a.scen||"",eq:a.scen&&SCEN[a.scen]?SCEN[a.scen].eq:"",detected:an.at,desc:a.plain,how:"Automatic alert from the Network monitor ("+(an.sample?"sample traffic":an.file)+")",
+    protocol:ev.proto||"",port:ev.port?String(ev.port):"",errmsg:ev.msg||"",issue:a.title,iocs:[ev.src&&"Source: "+ev.src,ev.dst&&"Destination: "+ev.dst,ev.count&&"Count: "+ev.count].filter(Boolean).join("\n"),malicious:a.sev==="bad",
+    timeline:[{at:an.at,text:"Network monitor alert: "+a.title},{at:now,text:"Incident report started from the alert"}],created:now};
+  ui.linkInc=id;ui.inc=id;if(a.scen&&SCEN[a.scen]){ui.sc=a.scen;ui.eq=SCEN[a.scen].eq}ui.ship=s.id;keepUI();
+  put("incidents",id,strip(o)).then(()=>{saveTraffic(s.id,X=>{const A=X.analyses.find(z=>z.id===anId);if(A){A.ack={...(A.ack||{}),[alId]:{at:now,by:role,inc:id}}}});location.hash="olay";toast("Incident report started")});
+}
+function bindMonitor(){
+  const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
+  const s=state.ships.find(x=>x.id===ui.mnShip)||state.ships[0];if(!s)return;
+  const sh=$("#mn_ship");sh&&sh.addEventListener("change",e=>{ui.mnShip=e.target.value;keepUI();render()});
+  const readFile=f=>{if(!f)return;if(f.size>60e6){toast("The file is larger than 60 MB. Record a shorter period.");return}toast("Checking the recording…");
+    const r=new FileReader();r.onload=()=>{try{const {pk,fmt}=parseCapture(String(r.result));runCheck(s,pk,f.name,fmt,false)}catch(err){toast(err.message)}};r.onerror=()=>toast("Couldn't read the file.");r.readAsText(f)};
+  const fi=$("#mn_file");fi&&fi.addEventListener("change",e=>readFile(e.target.files[0]));
+  const dz=$("#mnDrop");if(dz){["dragover","dragenter"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("over")}));["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,()=>dz.classList.remove("over")));dz.addEventListener("drop",e=>{e.preventDefault();readFile(e.dataTransfer.files[0])})}
+  const sm=$("#mnSample");sm&&sm.addEventListener("click",()=>runCheck(s,sampleTraffic(),"","Sample",true));
+  on("[data-alack]","click",e=>{const [an,al]=e.currentTarget.dataset.alack.split("|");saveTraffic(s.id,X=>{const A=X.analyses.find(z=>z.id===an);if(A)A.ack={...(A.ack||{}),[al]:{at:new Date().toISOString(),by:role}}});toast("Marked as seen")});
+  on("[data-alinc]","click",e=>{const [an,al]=e.currentTarget.dataset.alinc.split("|");alertIncident(s,an,al)});
+  on("[data-algo]","click",e=>{ui.sc=e.currentTarget.dataset.algo;ui.eq=SCEN[ui.sc].eq;ui.ship=e.currentTarget.dataset.alship;ui.open={};keepUI()});
+  on("[data-mnbase]","click",e=>{const id=e.currentTarget.dataset.mnbase;const an=trafficOf(s.id).analyses.find(a=>a.id===id);if(!an)return;
+    const hosts=ui.lastHostsId===id&&ui.lastHosts?ui.lastHosts:(an.talkers||[]).map(t=>t.ip).filter(isPriv);
+    saveTraffic(s.id,X=>{X.baseline={at:an.at,p95:Math.max(an.p95,1),avg:an.avg,hosts:hosts.slice(0,500),from:an.file}});toast("Saved as normal traffic")});
+  const bd=$("#mnBaseDel");bd&&bd.addEventListener("click",()=>saveTraffic(s.id,X=>{delete X.baseline}));
+  on("[data-mndel]","click",e=>{const id=e.currentTarget.dataset.mndel;saveTraffic(s.id,X=>{X.analyses=X.analyses.filter(a=>a.id!==id)})});
+  const sc=$("#mnScript");sc&&sc.addEventListener("click",()=>saveBlob("pruva_monitor.py",MONITOR_PY));
+  const scc=$("#mnScriptCopy");scc&&scc.addEventListener("click",()=>copyText(MONITOR_PY));
+}
+
 /* ================== DATA LAYER ================== */
-const state = {ships:[],checks:{},incidents:[],routine:{},mode:"loading"};
+const state = {ships:[],checks:{},incidents:[],routine:{},traffic:{},mode:"loading"};
 let db=null, downloads=null;
 const LKEY="pruva-siber-local";
 const EXAMPLE={
   ships:[{id:"ship-example1",name:"EXAMPLE – MV Marmara Star",imo:"9876543",flag:"Malta",type:"Bulk carrier",eu:true,e26:true,example:true,created:"2026-11-04T07:00:00.000Z",
-    network:{zones:[{id:"internet",type:"internet",name:"Internet / satellite"},{id:"gateway",type:"gateway",name:"Satellite link & router"},{id:"office",type:"office",name:"Office network"},{id:"crew",type:"crew",name:"Crew Wi-Fi"},{id:"bridge",type:"bridge",name:"Bridge network"},{id:"engine",type:"engine",name:"Engine network"},{id:"cargo",type:"cargo",name:"Cargo network"}],
+    network:{zones:[{id:"internet",type:"internet",name:"Internet / satellite"},{id:"gateway",type:"gateway",name:"Satellite link & router"},{id:"office",type:"office",cidr:"10.0.10.0/24",name:"Office network"},{id:"crew",type:"crew",cidr:"10.0.40.0/24",name:"Crew Wi-Fi"},{id:"bridge",type:"bridge",cidr:"10.0.20.0/24",name:"Bridge network"},{id:"engine",type:"engine",cidr:"10.0.30.0/24",name:"Engine network"},{id:"cargo",type:"cargo",cidr:"10.0.50.0/24",name:"Cargo network"}],
       links:[{a:"internet",b:"gateway",prot:"firewall"},{a:"gateway",b:"office",prot:"firewall"},{a:"gateway",b:"crew",prot:"switch"},{a:"gateway",b:"bridge",prot:"firewall"},{a:"office",b:"engine",prot:"firewall"},{a:"office",b:"cargo",prot:"none"},{a:"bridge",b:"engine",prot:"switch"}]},
     
     equipment:[
-      {name:"ECDIS No.1",type:"ecdis",vendor:"Example maker",sw:"v5.3",net:"Bridge network",updated:"2026-09-12",remote:true},
-      {name:"GPS receiver No.1",type:"gnss",vendor:"Example maker",sw:"fw 3.0",net:"Bridge network",updated:"2026-04-02",remote:false},
-      {name:"GMDSS console",type:"gmdss",vendor:"Example maker",sw:"",net:"Bridge network",updated:"2025-12-10",remote:false},
-      {name:"Main engine remote control",type:"propulsion",vendor:"Example maker",sw:"fw 2.1",net:"Engine network",updated:"2026-03-02",remote:false},
-      {name:"Engine alarm & monitoring",type:"ams",vendor:"Example maker",sw:"v8",net:"Engine network",updated:"2026-03-02",remote:true},
-      {name:"Loading computer",type:"cargo",vendor:"Example maker",sw:"v12",net:"Office network",updated:"2026-05-20",remote:false,zone:"office"},
-      {name:"VSAT terminal and firewall",type:"vsat",vendor:"Example maker",sw:"fw 8.4",net:"Gateway",updated:"2026-10-01",remote:true},
-      {name:"Master's office computer",type:"it",vendor:"",sw:"Windows 11",net:"Office network",updated:"2026-10-15",remote:true},
+      {name:"ECDIS No.1",ip:"10.0.20.5",type:"ecdis",vendor:"Example maker",sw:"v5.3",net:"Bridge network",updated:"2026-09-12",remote:true},
+      {name:"GPS receiver No.1",ip:"10.0.20.7",type:"gnss",vendor:"Example maker",sw:"fw 3.0",net:"Bridge network",updated:"2026-04-02",remote:false},
+      {name:"GMDSS console",ip:"10.0.20.9",type:"gmdss",vendor:"Example maker",sw:"",net:"Bridge network",updated:"2025-12-10",remote:false},
+      {name:"Main engine remote control",ip:"10.0.30.10",type:"propulsion",vendor:"Example maker",sw:"fw 2.1",net:"Engine network",updated:"2026-03-02",remote:false},
+      {name:"Engine alarm & monitoring",ip:"10.0.30.20",type:"ams",vendor:"Example maker",sw:"v8",net:"Engine network",updated:"2026-03-02",remote:true},
+      {name:"Loading computer",ip:"10.0.10.15",type:"cargo",vendor:"Example maker",sw:"v12",net:"Office network",updated:"2026-05-20",remote:false,zone:"office"},
+      {name:"VSAT terminal and firewall",ip:"10.0.10.1",type:"vsat",vendor:"Example maker",sw:"fw 8.4",net:"Gateway",updated:"2026-10-01",remote:true},
+      {name:"Master's office computer",ip:"10.0.10.11",type:"it",vendor:"",sw:"Windows 11",net:"Office network",updated:"2026-10-15",remote:true},
       {name:"Crew Wi-Fi",type:"crew",vendor:"",sw:"",net:"Crew network",updated:"2026-06-01",remote:true}]}],
   checks:{"ship-example1":{ship:"ship-example1",answers:{
     I1:{status:"ok",ev:"Equipment list rev.3, 12 Sep 2026",verified:true,by:"ship",at:"2026-10-20T08:00:00.000Z"},
@@ -1250,15 +1563,17 @@ function exampleRoutine(id){
   const hist={};Object.entries(last).forEach(([k,v])=>hist[k]=[v]);
   return {[id]:{ship:id,last,hist}};
 }
-function loadLocal(){try{const raw=localStorage.getItem(LKEY);const d=JSON.parse(raw||"null");if(d){state.ships=d.ships||[];state.checks=d.checks||{};state.incidents=d.incidents||[];state.routine=d.routine||{};
+function loadLocal(){try{const raw=localStorage.getItem(LKEY);const d=JSON.parse(raw||"null");if(d){state.ships=d.ships||[];state.checks=d.checks||{};state.incidents=d.incidents||[];state.routine=d.routine||{};state.traffic=d.traffic||{};
     let changed=false;const ex=EXAMPLE.ships[0];
     state.ships.forEach(s=>{if(!s.example)return;
       if(!s.network){s.network=JSON.parse(JSON.stringify(ex.network));changed=true}
       (s.equipment||[]).forEach(e=>{if(e.type==="cargo"&&!e.zone&&/office|business/i.test(e.net||"")){e.zone="office";changed=true}});
-      if(!state.routine[s.id]){Object.assign(state.routine,exampleRoutine(s.id));changed=true}});
+      if(!state.routine[s.id]){Object.assign(state.routine,exampleRoutine(s.id));changed=true}
+      (s.network?.zones||[]).forEach(z=>{const ez=ex.network.zones.find(q=>q.id===z.id);if(ez&&ez.cidr&&!z.cidr){z.cidr=ez.cidr;changed=true}});
+      (s.equipment||[]).forEach(e=>{const ee=ex.equipment.find(q=>q.name===e.name);if(ee&&ee.ip&&!e.ip){e.ip=ee.ip;changed=true}})});
     if(changed)saveLocal();return}
   if(raw===null&&!window.claude){const ex=JSON.parse(JSON.stringify(EXAMPLE));state.ships=ex.ships;state.checks=ex.checks;state.incidents=ex.incidents;state.routine=exampleRoutine("ship-example1");saveLocal()}}catch(e){}}
-function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify({ships:state.ships,checks:state.checks,incidents:state.incidents,routine:state.routine}));return true}catch(e){toast("This browser's storage is full. Remove some photos.");return false}}
+function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify({ships:state.ships,checks:state.checks,incidents:state.incidents,routine:state.routine,traffic:state.traffic}));return true}catch(e){toast("This browser's storage is full. Remove some photos.");return false}}
 function uid(p){return p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 async function put(coll,id,obj){
   if(db){try{await db.collection(coll).doc(id).set(obj)}catch(e){toast(e.code==="invalid_argument"?"You don't have permission to change this.":"Couldn't save: "+(e.message||e.code));}}
@@ -1269,7 +1584,7 @@ async function del(coll,id){
   else{applyLocal(coll,id,null);saveLocal();render();}
 }
 function applyLocal(coll,id,obj){
-  if(coll==="checks"||coll==="routine"){const m=state[coll];if(obj)m[id]=obj;else delete m[id];return}
+  if(coll==="checks"||coll==="routine"||coll==="traffic"){const m=state[coll];if(obj)m[id]=obj;else delete m[id];return}
   const arr=coll==="ships"?state.ships:state.incidents;const i=arr.findIndex(x=>x.id===id);
   if(obj){obj={...obj,id};if(i>=0)arr[i]=obj;else arr.push(obj)}else if(i>=0)arr.splice(i,1);
 }
@@ -1281,7 +1596,7 @@ async function init(){
   try{db=await (window.claude?.use?.("db")??null)}catch(e){db=null}
   try{assets=await (window.claude?.use?.("assets")??null)}catch(e){assets=null}
   if(!db){clearTimeout(timer);state.mode="local";loadLocal();setConn("Local mode · saved in this browser only");render();return}
-  let got=0;const done=()=>{if(++got>=4){clearTimeout(timer);state.mode="db";setConn("Shared with company · live");}render()};
+  let got=0;const done=()=>{if(++got>=5){clearTimeout(timer);state.mode="db";setConn("Shared with company · live");}render()};
   const onErr=e=>{setConn("Connection problem: "+e.code)};
   const firsts={};
   const sub=(name,fn)=>db.collection(name).onSnapshot(s=>{fn(s);if(!firsts[name]&&!s.metadata.fromCache){firsts[name]=1;done()}else render()},onErr);
@@ -1289,6 +1604,7 @@ async function init(){
   sub("checks",s=>{const o={};s.docs.forEach(d=>o[d.id]=d.data());state.checks=o});
   sub("incidents",s=>{state.incidents=s.docs.map(d=>({...d.data(),id:d.id}))});
   sub("routine",s=>{const o={};s.docs.forEach(d=>o[d.id]=d.data());state.routine=o});
+  sub("traffic",s=>{const o={};s.docs.forEach(d=>o[d.id]=d.data());state.traffic=o});
 }
 
 /* ================== HELPERS ================== */
@@ -1328,9 +1644,9 @@ async function saveBlob(name,data){
 const saveFile=(name,text)=>saveBlob(name,text);
 
 /* ================== VIEW STATE ================== */
-const views={panel:vHome,rutin:vRoutine,playbook:vGuide,olay:vIncidents,kontrol:vChecks,filo:vShips,mevzuat:vRules};
-const CRUMB={panel:"Home",rutin:"Routine checks",playbook:"Emergency guide",olay:"Incident reports",kontrol:"Ship checklist",filo:"Ships & equipment",mevzuat:"Rules & references"};
-let ui={ship:null,eq:"it",sc:"ransomware",marsec:1,inc:null,ctlShip:null,ctlFilter:"all",done:{},params:{},plat:{},linkInc:"",open:{},openIT:{},rtShip:null,rtFreq:"todo",rtOpen:{},eqEdit:null,eqOpen:{},rtPhoto:{},netEdit:false,netFocus:null};
+const views={panel:vHome,rutin:vRoutine,izle:vMonitor,playbook:vGuide,olay:vIncidents,kontrol:vChecks,filo:vShips,mevzuat:vRules};
+const CRUMB={panel:"Home",rutin:"Routine checks",izle:"Network monitor",playbook:"Emergency guide",olay:"Incident reports",kontrol:"Ship checklist",filo:"Ships & equipment",mevzuat:"Rules & references"};
+let ui={ship:null,eq:"it",sc:"ransomware",marsec:1,inc:null,ctlShip:null,ctlFilter:"all",done:{},params:{},plat:{},linkInc:"",open:{},openIT:{},rtShip:null,rtFreq:"todo",rtOpen:{},eqEdit:null,eqOpen:{},rtPhoto:{},netEdit:false,netFocus:null,mnShip:null};
 try{Object.assign(ui,JSON.parse(sessionStorage.getItem("pruva-ui")||"{}"))}catch(e){}
 if(!SCEN[ui.sc])ui.sc="ransomware"; if(!EQUIP[ui.eq])ui.eq=SCEN[ui.sc].eq;
 function keepUI(){try{sessionStorage.setItem("pruva-ui",JSON.stringify({ship:ui.ship,eq:ui.eq,sc:ui.sc,marsec:ui.marsec,ctlShip:ui.ctlShip,params:ui.params,plat:ui.plat,linkInc:ui.linkInc,done:ui.done,rtShip:ui.rtShip}))}catch(e){}}
@@ -1344,6 +1660,7 @@ function render(){
   const cr=document.getElementById("crumb");if(cr)cr.textContent=CRUMB[v];
   const ob=state.incidents.filter(i=>!isClosed(i)).length,bd=document.getElementById("incBadge");if(bd){bd.hidden=!ob;bd.textContent=ob}
   const ro=state.ships.reduce((t,s)=>t+routineSummary(s.id).over,0),rb=document.getElementById("rtBadge");if(rb){rb.hidden=!ro;rb.textContent=ro}
+  const na=alertCount("bad"),nb=document.getElementById("mnBadge");if(nb){nb.hidden=!na;nb.textContent=na}
   if(fid){const el=document.getElementById(fid);if(el&&el.tagName!=="BUTTON")el.focus()}
 }
 window.addEventListener("hashchange",()=>{render();window.scrollTo(0,0)});
@@ -1359,6 +1676,7 @@ function vHome(){
   const open=state.incidents.filter(i=>!isClosed(i));
   const late=open.flatMap(i=>deadlines(i).filter(d=>d.late).map(d=>({i,d})));
   return `<a class="sos" href="#playbook"><span class="sos-ic" aria-hidden="true">!</span><span><b>Is something wrong right now?</b><span>Open the emergency guide. It tells you what to do, step by step.</span></span><span class="sos-go">Start ›</span></a>
+    ${(()=>{const al=state.ships.flatMap(s=>openAlerts(s.id).filter(a=>a.sev==="bad").map(a=>({...a,ship:s})));return al.length?`<a class="netalert" href="#izle" data-mnship="${al[0].ship.id}"><span class="sos-ic" aria-hidden="true">!</span><span><b>Network alert${al.length>1?"s":""}: ${esc(al[0].title)}</b><span>${esc(al[0].ship.name)}${al.length>1?` · and ${al.length-1} more`:""} — open the network monitor</span></span><span class="sos-go">Open ›</span></a>`:""})()}
     ${late.length?`<div class="notice warn"><b>A report to the authorities is late:</b> ${late.map(x=>`${esc(x.i.title||"Incident")} – ${x.d.name}`).join("; ")}. <a href="#olay">Open incident reports</a></div>`:""}
     ${open.length?`<section class="block"><h2>Open incidents</h2><ol class="list">${open.map(i=>{const g=i.guideDone?Object.keys(i.guideDone).length:0;const n=deadlines(i).find(d=>!d.sent);
       return `<li><a href="#olay" data-openinc="${i.id}" class="li-main"><b>${esc(i.title||"Untitled incident")}</b><span class="muted">${esc(shipName(i.ship))} · noticed ${fmtUTC(i.detected)} · ${g} steps done</span></a>${n?`<span class="pill ${n.late?'bad':'warn'}">${n.name}: ${rel(n.due)}</span>`:""}</li>`}).join("")}</ol></section>`:""}
@@ -1373,6 +1691,7 @@ function vHome(){
       <li><b>Emergency guide</b> — when something goes wrong, choose what you see. The app gives you numbered steps. Do them in order and tick each one.</li>
       <li><b>Incident reports</b> — every step you tick is written into the report with the time. The company uses it to inform the authorities.</li>
       <li><b>Routine checks</b> — small daily, weekly, monthly and yearly checks. The app shows what is due and what is overdue.</li>
+      <li><b>Network monitor</b> — checks recordings of the ship's network traffic and raises an alert when it finds an attack or something unusual.</li>
       <li><b>Ship checklist</b> — simple yes/no questions that inspectors ask. The ship answers, the company checks and signs off.</li>
       <li><b>Ships &amp; equipment</b> — the list of computers and computer-controlled equipment on board.</li></ol></section>`;
 }
@@ -1581,6 +1900,7 @@ function vShips(){
         <label class="f">Maker / model<input id="eq_vendor"></label>
         <label class="f">Software version <span class="muted">(if known)</span><input id="eq_sw" class="mono"></label>
         <label class="f">Network <span class="muted">(if known)</span><input id="eq_net" placeholder="e.g. Bridge network"></label>
+        <label class="f">IP address <span class="muted">(if known)</span><input id="eq_ip" class="mono" placeholder="e.g. 10.0.20.5"></label>
         <label class="f">Last updated<input id="eq_upd" type="date"></label>
         <label class="chk wide"><input type="checkbox" id="eq_remote"> Connects to the internet, or a service company can log in remotely</label>
         <div class="wide"><button class="btn primary" type="submit">Add</button></div></form></details></section>
@@ -1621,12 +1941,14 @@ function collectInc(base){
     actions:v("in_act").value,cause:v("in_cause").value,lessons:v("in_less").value,authority:v("in_auth").value,status:v("in_status").value,updated:new Date().toISOString()};
 }
 function bind(v){
+  if(v==="izle")bindMonitor();
   document.querySelectorAll("[data-viewphoto]").forEach(el=>el.addEventListener("click",e=>openPhoto(e.currentTarget.dataset.viewphoto)));
   if(v==="rutin")bindRoutine();
   const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
   on("[data-goship]","click",e=>{ui.ctlShip=e.currentTarget.dataset.goship;keepUI()});
   on("[data-rtship]","click",e=>{ui.rtShip=e.currentTarget.dataset.rtship;keepUI()});
   on("[data-selship2]","click",e=>{ui.ship=e.currentTarget.dataset.selship2;keepUI()});
+  on("[data-mnship]","click",e=>{ui.mnShip=e.currentTarget.dataset.mnship;keepUI()});
   on("[data-openinc]","click",e=>{e.preventDefault();ui.inc=e.currentTarget.dataset.openinc;if(location.hash!=="#olay")location.hash="olay";else render()});
   if(v==="playbook"&&state.ships.length){
     const s=curShip();
@@ -1682,7 +2004,7 @@ function bind(v){
     const sf=$("#shipForm");if(sf){const s=state.ships.find(x=>x.id===ui.ship)||state.ships[0];
       sf.addEventListener("submit",e=>{e.preventDefault();put("ships",s.id,{...strip(s),name:$("#sh_name").value.trim()||"Unnamed ship",imo:$("#sh_imo").value.trim(),flag:$("#sh_flag").value.trim(),type:$("#sh_type").value.trim(),eu:$("#sh_eu").checked,e26:$("#sh_e26").checked});toast("Saved")});
       on("[data-delship]","click",e=>{const b=e.currentTarget;if(b.dataset.confirm){del("ships",s.id);del("checks",s.id);ui.ship=null;toast("Ship deleted")}else{b.dataset.confirm=1;b.textContent="Tap again to delete";b.classList.add("primary")}});
-      $("#eqForm").addEventListener("submit",e=>{e.preventDefault();const eq={name:$("#eq_name").value.trim(),type:$("#eq_type").value,vendor:$("#eq_vendor").value.trim(),sw:$("#eq_sw").value.trim(),net:$("#eq_net").value.trim(),updated:$("#eq_upd").value,remote:$("#eq_remote").checked,updates:$("#eq_sw").value.trim()?[{date:$("#eq_upd").value||todayStr(),from:"",to:$("#eq_sw").value.trim(),who:"",note:"Added to equipment list",at:new Date().toISOString(),by:role}]:[]};
+      $("#eqForm").addEventListener("submit",e=>{e.preventDefault();const eq={name:$("#eq_name").value.trim(),type:$("#eq_type").value,vendor:$("#eq_vendor").value.trim(),sw:$("#eq_sw").value.trim(),net:$("#eq_net").value.trim(),ip:$("#eq_ip").value.trim(),updated:$("#eq_upd").value,remote:$("#eq_remote").checked,updates:$("#eq_sw").value.trim()?[{date:$("#eq_upd").value||todayStr(),from:"",to:$("#eq_sw").value.trim(),who:"",note:"Added to equipment list",at:new Date().toISOString(),by:role}]:[]};
         put("ships",s.id,{...strip(s),equipment:[...(s.equipment||[]),eq]});toast("Added")});
       on("[data-deleq]","click",e=>{const b=e.currentTarget;if(!b.dataset.confirm){b.dataset.confirm=1;b.textContent="Tap again to remove";b.classList.add("primary");return}const i=+b.dataset.deleq;const eqs=[...(s.equipment||[])];eqs.splice(i,1);ui.eqEdit=null;put("ships",s.id,{...strip(s),equipment:eqs})});
       bindEquipment(s);
